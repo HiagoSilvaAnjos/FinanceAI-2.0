@@ -31,14 +31,16 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      // Garantir que o callback seja correto
+      redirectURI: `${baseUrl}/api/auth/callback/google`,
     },
   },
 
-  // Configurações importantes para produção - EXPANDIDAS para Vercel
+  // Configurações importantes para produção
   trustedOrigins: [
     baseUrl,
     "https://financeai-25bw.onrender.com",
-    "https://finance-ai-2-0.vercel.app", // seu dominio da vercel
+    "https://finance-ai-2-0.vercel.app",
     "http://localhost:3000",
   ],
 
