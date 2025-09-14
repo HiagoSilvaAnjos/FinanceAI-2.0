@@ -73,11 +73,11 @@ const SignInForm = () => {
     });
   }
 
-  //   const handleSignInWithGoogle = async () => {
-  //     await authClient.signIn.social({
-  //       provider: "google",
-  //     });
-  //   };
+  const handleSignInWithGoogle = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+    });
+  };
   return (
     <Card>
       <CardHeader>
@@ -121,17 +121,17 @@ const SignInForm = () => {
               )}
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col gap-3">
             <Button
               type="submit"
               variant={"default"}
-              className="text-foreground cursor-pointer"
+              className="text-foreground w-full cursor-pointer"
             >
               Entrar na Conta
             </Button>
-            {/* <Button
+            <Button
               variant="outline"
-              className="w-full"
+              className="w-full cursor-pointer"
               onClick={handleSignInWithGoogle}
               type="button"
             >
@@ -154,7 +154,7 @@ const SignInForm = () => {
                 />
               </svg>
               Entrar com Google
-            </Button> */}
+            </Button>
           </CardFooter>
         </form>
       </Form>
