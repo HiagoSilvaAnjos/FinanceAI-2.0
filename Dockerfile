@@ -33,8 +33,8 @@ ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
 ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 ENV NODE_ENV=${NODE_ENV}
 
-# Build da aplicação (com fallback caso cross-env não funcione)
-RUN npm run build:prod || NODE_ENV=production npm run build
+# Build da aplicação usando script sem cross-env
+RUN npm run build:simple
 
 # Limpar dependências de desenvolvimento após o build
 RUN npm prune --production
