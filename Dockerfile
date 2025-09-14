@@ -1,57 +1,93 @@
-# Dockerfile para FinanceAI - Versão Simplificada
-FROM node:22-slim as builder
+# Dockerfile para Finance AI 2.0
+FROM node:22-alpine as builder
+
 WORKDIR /app
 
-# Instalar dependências do sistema
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copiar arquivos de dependência e instalar TODAS as dependências (dev + prod)
+# Copiar arquivos de dependências
 COPY package.json package-lock.json ./
+
+# Instalar dependências
 RUN npm ci
 
 # Copiar código fonte
 COPY . .
+
+# Remover arquivo de ambiente local se existir
 RUN rm -f .env.local
 
-# Configurar variáveis de ambiente para o build
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+# Gerar schema do Drizzle e executar migrações se necessário
+RUN npm run db:generate:prod
+
+# Definir variáveis de ambiente para build
+ARG DATABASE_URL
+ARG BETTER_AUTH_SECRET
+ARG BETTER_AUTH_URL
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG NODE_ENV=production
+ARG PORT=10000
+
+ENV DATABASE_URL=${DATABASE_URL}
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
+ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+ENV NODE_ENV=${NODE_ENV}
+ENV PORT=${PORT}
 
 # Build da aplicação
-RUN npm run build
+RUN npm run build:prod
 
-# Estágio de produção
-FROM node:22-slim as runner
+# Limpar dependências de desenvolvimento
+RUN npm prune --production
+
+# Stage de produção
+FROM node:22-alpine as runner
+
 WORKDIR /app
 
-# Instalar apenas ca-certificates para HTTPS
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-
-# Configurações de ambiente
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+# Instalar dumb-init para gerenciamento de processos
+RUN apk add --no-cache dumb-init
 
 # Criar usuário não-root
-RUN groupadd --gid 1001 nodejs && \
-    useradd --uid 1001 --gid nodejs --shell /bin/bash --create-home nextjs
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
 
-# Copiar apenas os arquivos necessários para produção
+# Copiar arquivos necessários do builder
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 
-# Verificar se os arquivos foram copiados
-RUN ls -la && ls -la .next/
+# Configurar variáveis de ambiente de produção
+ENV NODE_ENV=production
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+ENV HOSTNAME="0.0.0.0"
 
+# Definir argumentos e variáveis de ambiente para runtime
+ARG DATABASE_URL
+ARG BETTER_AUTH_SECRET
+ARG BETTER_AUTH_URL
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG PORT=3000
+
+ENV DATABASE_URL=${DATABASE_URL}
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
+ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+ENV PORT=${PORT}
+
+# Mudar para usuário não-root
 USER nextjs
 
 # Expor porta
-EXPOSE 3000
+EXPOSE ${PORT}
 
-# Comando para iniciar a aplicação (usando o servidor standalone)
-CMD ["node", "server.js"]
+# Usar dumb-init para inicializar o processo
+ENTRYPOINT ["dumb-init", "--"]
+
+# Comando para iniciar a aplicação
+CMD ["sh", "-c", "node server.js"]
