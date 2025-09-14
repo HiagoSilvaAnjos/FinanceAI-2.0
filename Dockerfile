@@ -55,7 +55,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+# Remover linha da pasta drizzle - não é necessária em runtime
 
 # Configurar variáveis de ambiente de produção
 ENV NODE_ENV=production
