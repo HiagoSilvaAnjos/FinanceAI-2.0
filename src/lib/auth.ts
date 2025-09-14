@@ -6,8 +6,9 @@ import * as schema from "@/db/schema";
 
 // Detectar se está na Vercel e ajustar URL
 const getBaseUrl = () => {
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+  // Para Vercel, sempre usar o domínio principal
+  if (process.env.VERCEL) {
+    return "https://finance-ai-2-0.vercel.app";
   }
   if (process.env.BETTER_AUTH_URL) {
     return process.env.BETTER_AUTH_URL;
