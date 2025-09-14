@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   experimental: {
     esmExternals: "loose",
   },
@@ -14,6 +15,12 @@ const nextConfig = {
     return config;
   },
   transpilePackages: ["tailwindcss"],
+  // Otimizações para Docker
+  compress: true,
+  poweredByHeader: false,
+  // Garantir que os assets sejam incluídos
+  trailingSlash: false,
+  generateEtags: false,
 };
 
 module.exports = nextConfig;

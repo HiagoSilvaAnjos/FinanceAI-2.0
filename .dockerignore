@@ -1,0 +1,25 @@
+# .dockerignore
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+.next
+.env.local
+.env.development
+node_modules
+npm-debug.log*
+.nyc_output
+.coverage
+.eslintcache
+build.log
+
+# Manter apenas os arquivos necessários para o build
+!package.json
+!package-lock.json
+!next.config.js
+!tailwind.config.*
+!postcss.config.*
+!src/
+!public/
+!.env.production
