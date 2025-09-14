@@ -1,5 +1,5 @@
-# Dockerfile para FinanceAI - Versão Otimizada
-FROM node:22-slim as base
+# Dockerfile para FinanceAI - Versão Simplificada
+FROM node:22-slim as builder
 WORKDIR /app
 
 # Instalar dependências do sistema
@@ -8,79 +8,50 @@ RUN apt-get update && apt-get install -y \
     make \
     g++ \
     ca-certificates \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Estágio de instalação de dependências
-FROM base as deps
-COPY package.json package-lock.json ./
-RUN npm ci --only=production && npm cache clean --force
-
-# Estágio de build
-FROM base as builder
+# Copiar arquivos de dependência e instalar TODAS as dependências (dev + prod)
 COPY package.json package-lock.json ./
 RUN npm ci
 
+# Copiar código fonte
 COPY . .
 RUN rm -f .env.local
 
 # Configurar variáveis de ambiente para o build
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV SKIP_ENV_VALIDATION=1
 
-# Build da aplicação com logs detalhados
-RUN echo "Starting build..." && \
-    npm run build && \
-    echo "Build completed successfully!" && \
-    ls -la .next/ && \
-    echo "Contents of .next:" && \
-    find .next -type f -name "*.json" | head -10
+# Build da aplicação
+RUN npm run build
 
 # Estágio de produção
-FROM base as runner
+FROM node:22-slim as runner
 WORKDIR /app
+
+# Instalar apenas ca-certificates para HTTPS
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Configurações de ambiente
 ENV NODE_ENV=production
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 ENV NEXT_TELEMETRY_DISABLED=1
-
-# Variáveis de ambiente para produção
-ARG DATABASE_URL
-ARG PORT=3000
-ARG BETTER_AUTH_SECRET
-
-ENV DATABASE_URL=${DATABASE_URL}
-ENV PORT=${PORT}
-ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 
 # Criar usuário não-root
 RUN groupadd --gid 1001 nodejs && \
     useradd --uid 1001 --gid nodejs --shell /bin/bash --create-home nextjs
 
-# Copiar dependências de produção
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
-
-# Copiar arquivos do build
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+# Copiar apenas os arquivos necessários para produção
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
-# Verificar se o build foi copiado corretamente
-RUN echo "Checking build files..." && \
-    ls -la .next/ && \
-    test -f .next/BUILD_ID && echo "BUILD_ID found" || echo "BUILD_ID missing" && \
-    test -d .next/server && echo "Server files found" || echo "Server files missing"
+# Verificar se os arquivos foram copiados
+RUN ls -la && ls -la .next/
 
 USER nextjs
 
 # Expor porta
-EXPOSE ${PORT}
+EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/ || exit 1
-
-# Comando para iniciar a aplicação
-CMD ["sh", "-c", "echo 'Starting Next.js...' && NODE_ENV=production npx next start -H 0.0.0.0 -p ${PORT}"]
+# Comando para iniciar a aplicação (usando o servidor standalone)
+CMD ["node", "server.js"]
