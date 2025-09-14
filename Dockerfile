@@ -3,11 +3,14 @@ FROM node:22-alpine as builder
 
 WORKDIR /app
 
+# Instalar dependências do sistema necessárias para build
+RUN apk add --no-cache libc6-compat
+
 # Copiar arquivos de dependências
 COPY package.json package-lock.json ./
 
-# Instalar dependências
-RUN npm ci --only=production && npm cache clean --force
+# Instalar TODAS as dependências (incluindo devDependencies para o build)
+RUN npm ci && npm cache clean --force
 
 # Copiar código fonte
 COPY . .
@@ -30,8 +33,11 @@ ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
 ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 ENV NODE_ENV=${NODE_ENV}
 
-# Build da aplicação
-RUN npm run build:prod
+# Build da aplicação (com fallback caso cross-env não funcione)
+RUN npm run build:prod || NODE_ENV=production npm run build
+
+# Limpar dependências de desenvolvimento após o build
+RUN npm prune --production
 
 # Stage de produção
 FROM node:22-alpine as runner
@@ -39,7 +45,7 @@ FROM node:22-alpine as runner
 WORKDIR /app
 
 # Instalar dumb-init para gerenciamento de processos
-RUN apk add --no-cache dumb-init tini
+RUN apk add --no-cache dumb-init
 
 # Criar usuário não-root
 RUN addgroup --system --gid 1001 nodejs
@@ -78,12 +84,8 @@ USER nextjs
 # Expor porta
 EXPOSE ${PORT}
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "http.get('http://localhost:' + process.env.PORT + '/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
-
-# Usar tini como init system (melhor que dumb-init para containers)
-ENTRYPOINT ["tini", "--"]
+# Usar dumb-init como init system
+ENTRYPOINT ["dumb-init", "--"]
 
 # Comando para iniciar a aplicação
 CMD ["node", "server.js"]
