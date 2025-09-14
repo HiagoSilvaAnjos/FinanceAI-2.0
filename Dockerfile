@@ -1,4 +1,4 @@
-# Dockerfile para Finance AI 2.0
+# Dockerfile para Finance AI 2.0 - Versão Simplificada
 FROM node:22-alpine as builder
 
 WORKDIR /app
@@ -14,9 +14,6 @@ COPY . .
 
 # Remover arquivo de ambiente local se existir
 RUN rm -f .env.local
-
-# Gerar schema do Drizzle e executar migrações se necessário
-RUN npm run db:generate:prod
 
 # Definir variáveis de ambiente para build
 ARG DATABASE_URL
@@ -35,7 +32,7 @@ ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 ENV NODE_ENV=${NODE_ENV}
 ENV PORT=${PORT}
 
-# Build da aplicação
+# Build da aplicação (sem gerar Drizzle - assumindo que já foi gerado)
 RUN npm run build:prod
 
 # Limpar dependências de desenvolvimento
@@ -71,7 +68,7 @@ ARG BETTER_AUTH_SECRET
 ARG BETTER_AUTH_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
-ARG PORT=3000
+ARG PORT=10000
 
 ENV DATABASE_URL=${DATABASE_URL}
 ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
