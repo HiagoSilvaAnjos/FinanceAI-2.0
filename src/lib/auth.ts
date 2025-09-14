@@ -4,41 +4,18 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
-// Detectar a plataforma e configurar URLs dinamicamente
+// Detectar se está na Vercel e ajustar URL
 const getBaseUrl = () => {
-  // Vercel
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-
-  // Render ou outras plataformas
   if (process.env.BETTER_AUTH_URL) {
     return process.env.BETTER_AUTH_URL;
   }
-
-  // Desenvolvimento local
   return "http://localhost:3000";
 };
 
 const baseUrl = getBaseUrl();
-
-// URLs confiáveis baseadas na plataforma
-const getTrustedOrigins = () => {
-  const origins = [
-    "http://localhost:3000", // desenvolvimento
-  ];
-
-  if (process.env.VERCEL_URL) {
-    origins.push(`https://${process.env.VERCEL_URL}`);
-    origins.push("https://finance-ai-2-0.vercel.app");
-  }
-
-  if (process.env.BETTER_AUTH_URL) {
-    origins.push(process.env.BETTER_AUTH_URL);
-  }
-
-  return origins;
-};
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -54,17 +31,27 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      redirectURI: `${baseUrl}/api/auth/callback/google`,
     },
   },
 
-  // URLs confiáveis dinâmicas
-  trustedOrigins: getTrustedOrigins(),
+  // Configurações importantes para produção - EXPANDIDAS para Vercel
+  trustedOrigins: [
+    baseUrl,
+    "https://financeai-25bw.onrender.com",
+    "https://finance-ai-2-0.vercel.app", // seu dominio da vercel
+    "http://localhost:3000",
+  ],
 
-  // Configurações de CORS mais permissivas
+  // Configurações de CORS mais permissivas para Vercel
   cors: {
-    origin: getTrustedOrigins(),
+    origin: [
+      baseUrl,
+      "https://financeai-25bw.onrender.com",
+      "https://finance-ai-2-0.vercel.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
@@ -72,7 +59,6 @@ export const auth = betterAuth({
       "Accept",
       "Origin",
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   },
 
   user: {
@@ -86,19 +72,19 @@ export const auth = betterAuth({
   // Base URL dinâmica
   baseURL: baseUrl,
 
-  // Configurações de segurança para multi-plataforma
+  // Configuração adicional para produção
   advanced: {
     crossSubDomainCookies: {
       enabled: false,
     },
-    cookiePrefix: "better-auth",
-    generateId: () => crypto.randomUUID(),
+    // Configurações específicas para Vercel
+    ...(process.env.VERCEL && {
+      cookiePrefix: "better-auth",
+      generateId: () => crypto.randomUUID(),
+    }),
   },
 
-  // Secret dinâmico
-  secret: process.env.BETTER_AUTH_SECRET || "fallback-secret-for-dev",
-
-  // Configurações específicas para produção
+  // Configurações de sessão mais robustas
   session: {
     cookieCache: {
       enabled: true,

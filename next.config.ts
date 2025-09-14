@@ -63,7 +63,7 @@ const nextConfig = {
   },
 
   experimental: {
-    serverComponentsExternalPackages: ["pg"],
+    // Mudança para Next.js 15+
     ...(process.env.VERCEL
       ? {}
       : {
@@ -72,6 +72,10 @@ const nextConfig = {
         }),
   },
 
+  // Moved from experimental in Next.js 15+
+  serverExternalPackages: ["pg"],
+
+  // Configurações de timeout diferenciadas
   serverRuntimeConfig: {
     requestTimeout: process.env.VERCEL ? 10000 : 30000,
   },
