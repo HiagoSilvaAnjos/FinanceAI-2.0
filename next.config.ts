@@ -3,7 +3,7 @@
 const nextConfig = {
   output: "standalone",
 
-  webpack: (config: { resolve: { fallback: any } }, { isServer }: any) => {
+  webpack: (config: any, { isServer }: any) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -19,11 +19,11 @@ const nextConfig = {
   trailingSlash: false,
   generateEtags: false,
 
-  //permitir conexões externas e configurar headers
+  // Headers CORS otimizados
   async headers() {
     return [
       {
-        source: "/api/auth/:path*",
+        source: "/api/:path*",
         headers: [
           {
             key: "Access-Control-Allow-Origin",
@@ -37,11 +37,21 @@ const nextConfig = {
           },
           {
             key: "Access-Control-Allow-Headers",
-            value: "Content-Type, Authorization",
+            value: "Content-Type, Authorization, X-Requested-With",
           },
           {
             key: "Access-Control-Allow-Credentials",
             value: "true",
+          },
+        ],
+      },
+      // Health check sem CORS
+      {
+        source: "/api/health",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
           },
         ],
       },
@@ -50,6 +60,15 @@ const nextConfig = {
 
   experimental: {
     serverComponentsExternalPackages: ["pg"],
+    // Reduzir uso de memória
+    workerThreads: false,
+    cpus: 1,
+  },
+
+  // Configurações de timeout para Render
+  serverRuntimeConfig: {
+    // Aumentar timeout para cold starts
+    requestTimeout: 30000,
   },
 };
 

@@ -1,4 +1,4 @@
-# Dockerfile para Finance AI 2.0 - Versão Simplificada
+# Dockerfile otimizado para Render - Finance AI 2.0
 FROM node:22-alpine as builder
 
 WORKDIR /app
@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Instalar dependências
-RUN npm ci
+RUN npm ci --only=production && npm cache clean --force
 
 # Copiar código fonte
 COPY . .
@@ -22,7 +22,6 @@ ARG BETTER_AUTH_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
 ARG NODE_ENV=production
-ARG PORT=10000
 
 ENV DATABASE_URL=${DATABASE_URL}
 ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
@@ -30,13 +29,9 @@ ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
 ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
 ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 ENV NODE_ENV=${NODE_ENV}
-ENV PORT=${PORT}
 
-# Build da aplicação (sem gerar Drizzle - assumindo que já foi gerado)
+# Build da aplicação
 RUN npm run build:prod
-
-# Limpar dependências de desenvolvimento
-RUN npm prune --production
 
 # Stage de produção
 FROM node:22-alpine as runner
@@ -44,7 +39,7 @@ FROM node:22-alpine as runner
 WORKDIR /app
 
 # Instalar dumb-init para gerenciamento de processos
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init tini
 
 # Criar usuário não-root
 RUN addgroup --system --gid 1001 nodejs
@@ -55,7 +50,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-# Remover linha da pasta drizzle - não é necessária em runtime
 
 # Configurar variáveis de ambiente de produção
 ENV NODE_ENV=production
@@ -68,14 +62,15 @@ ARG BETTER_AUTH_SECRET
 ARG BETTER_AUTH_URL
 ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
-ARG PORT=10000
 
 ENV DATABASE_URL=${DATABASE_URL}
 ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
 ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
 ENV GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-ENV PORT=${PORT}
+
+# IMPORTANTE: Usar a porta que o Render fornecer
+ENV PORT=${PORT:-10000}
 
 # Mudar para usuário não-root
 USER nextjs
@@ -83,8 +78,12 @@ USER nextjs
 # Expor porta
 EXPOSE ${PORT}
 
-# Usar dumb-init para inicializar o processo
-ENTRYPOINT ["dumb-init", "--"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "http.get('http://localhost:' + process.env.PORT + '/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
+
+# Usar tini como init system (melhor que dumb-init para containers)
+ENTRYPOINT ["tini", "--"]
 
 # Comando para iniciar a aplicação
-CMD ["sh", "-c", "node server.js"]
+CMD ["node", "server.js"]
