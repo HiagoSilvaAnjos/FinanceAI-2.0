@@ -1,6 +1,6 @@
-/* eslint-disable import/no-anonymous-default-export */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -74,7 +74,5 @@ export default {
       },
     },
   },
-  plugins: [
-    import("tailwindcss-animate").then(({ default: plugin }) => plugin),
-  ],
+  plugins: [require("tailwindcss-animate")],
 };
