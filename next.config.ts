@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // Usar standalone apenas para Render/Docker
+  output: process.env.VERCEL ? undefined : "standalone",
 
   webpack: (config: any, { isServer }: any) => {
     if (!isServer) {
@@ -19,17 +20,19 @@ const nextConfig = {
   trailingSlash: false,
   generateEtags: false,
 
-  // Headers CORS otimizados
+  // Headers CORS otimizados para multi-plataforma
   async headers() {
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.BETTER_AUTH_URL || "http://localhost:3000";
+
     return [
       {
-        source: "/api/:path*",
+        source: "/api/auth/:path*",
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value:
-              process.env.BETTER_AUTH_URL ||
-              "https://financeai-25bw.onrender.com",
+            value: baseUrl,
           },
           {
             key: "Access-Control-Allow-Methods",
@@ -37,7 +40,8 @@ const nextConfig = {
           },
           {
             key: "Access-Control-Allow-Headers",
-            value: "Content-Type, Authorization, X-Requested-With",
+            value:
+              "Content-Type, Authorization, X-Requested-With, Accept, Origin",
           },
           {
             key: "Access-Control-Allow-Credentials",
@@ -60,15 +64,16 @@ const nextConfig = {
 
   experimental: {
     serverComponentsExternalPackages: ["pg"],
-    // Reduzir uso de memória
-    workerThreads: false,
-    cpus: 1,
+    ...(process.env.VERCEL
+      ? {}
+      : {
+          workerThreads: false,
+          cpus: 1,
+        }),
   },
 
-  // Configurações de timeout para Render
   serverRuntimeConfig: {
-    // Aumentar timeout para cold starts
-    requestTimeout: 30000,
+    requestTimeout: process.env.VERCEL ? 10000 : 30000,
   },
 };
 

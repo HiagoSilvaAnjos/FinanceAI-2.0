@@ -1,0 +1,53 @@
+{
+    "buildCommand": "npm run build:simple",
+    "devCommand": "npm run dev",
+    "installCommand": "npm ci",
+    "framework": "nextjs",
+    "regions": [
+        "iad1"
+    ],
+    "functions": {
+        "src/app/api/auth/[...all]/route.ts": {
+            "maxDuration": 30
+        }
+    },
+    "headers": [
+        {
+            "source": "/api/auth/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET, POST, PUT, DELETE, OPTIONS"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+                },
+                {
+                    "key": "Access-Control-Allow-Credentials",
+                    "value": "true"
+                }
+            ]
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/auth/(.*)",
+            "destination": "/api/auth/$1"
+        }
+    ],
+    "env": {
+        "NODE_ENV": "production",
+        "VERCEL": "1"
+    },
+    "build": {
+        "env": {
+            "NODE_ENV": "production",
+            "VERCEL": "1"
+        }
+    }
+}
