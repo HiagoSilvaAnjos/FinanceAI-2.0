@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 // import { authClient } from "@/lib/auth-client";
 
 const formSchema = z
@@ -57,31 +58,31 @@ const SignUpForm = () => {
   });
 
   async function onSubmit(values: FormValues) {
-    // await authClient.signUp.email({
-    //   email: values.email,
-    //   password: values.password,
-    //   name: values.name,
-    //   fetchOptions: {
-    //     onSuccess: () => {
-    //       router.push("/");
-    //     },
-    //     onError: (ctx) => {
-    //       if (ctx.error.code === "EMAIL_ALREADY_EXISTS") {
-    //         toast.error("E-mail já cadastrado.");
-    //         return form.setError("email", {
-    //           message: "E-mail já cadastrado.",
-    //         });
-    //       }
-    //       if (ctx.error.code === "WEAK_PASSWORD") {
-    //         toast.error("Senha muito fraca.");
-    //         return form.setError("password", {
-    //           message: "Senha muito fraca.",
-    //         });
-    //       }
-    //       toast.error(ctx.error.message);
-    //     },
-    //   },
-    // });
+    await authClient.signUp.email({
+      email: values.email,
+      password: values.password,
+      name: values.name,
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (ctx) => {
+          if (ctx.error.code === "EMAIL_ALREADY_EXISTS") {
+            toast.error("E-mail já cadastrado.");
+            return form.setError("email", {
+              message: "E-mail já cadastrado.",
+            });
+          }
+          if (ctx.error.code === "WEAK_PASSWORD") {
+            toast.error("Senha muito fraca.");
+            return form.setError("password", {
+              message: "Senha muito fraca.",
+            });
+          }
+          toast.error(ctx.error.message);
+        },
+      },
+    });
   }
 
   //   const handleSignUpWithGoogle = async () => {
