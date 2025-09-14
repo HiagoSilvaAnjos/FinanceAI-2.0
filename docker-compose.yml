@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: local-postgres-financeai
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: local_user
+      POSTGRES_PASSWORD: local_password
+      POSTGRES_DB: local_db
+      # Configurações adicionais para desenvolvimento
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Configurações de saúde do container
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U local_user -d local_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

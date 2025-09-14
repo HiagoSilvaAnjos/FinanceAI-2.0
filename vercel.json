@@ -1,0 +1,17 @@
+{
+    "buildCommand": "npm run build:prod",
+    "devCommand": "npm run dev",
+    "installCommand": "npm ci",
+    "framework": "nextjs",
+    "regions": [
+        "iad1"
+    ],
+    "env": {
+        "NODE_ENV": "production"
+    },
+    "build": {
+        "env": {
+            "NODE_ENV": "production"
+        }
+    }
+}
