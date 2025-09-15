@@ -4,9 +4,8 @@ import { PencilIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import UpsertTransactionDialog from "@/components/upsert-transaction-dialog";
 import { Transaction } from "@/types/transaction";
-
-// import UpsertTransactionDialog from "@/app/_components/upsert-transaction-dialog";
 
 interface EditTransactionButtonProps {
   transaction: Transaction;
@@ -25,7 +24,7 @@ const EditTransactionButton = ({ transaction }: EditTransactionButtonProps) => {
       >
         <PencilIcon />
       </Button>
-      {/* <UpsertTransactionDialog
+      <UpsertTransactionDialog
         defaultValues={{
           ...transaction,
           amount: Number(transaction.amount),
@@ -33,7 +32,7 @@ const EditTransactionButton = ({ transaction }: EditTransactionButtonProps) => {
         isOpen={dialogIsOpen}
         setIsOpen={setDialogIsOpen}
         transactionId={transaction.id}
-      /> */}
+      />
     </>
   );
 };

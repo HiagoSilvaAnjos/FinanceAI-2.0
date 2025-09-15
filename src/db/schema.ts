@@ -106,7 +106,7 @@ export const verificationTable = pgTable("verification", {
 
 export const transactionTable = pgTable("transaction", {
   id: uuid().primaryKey().defaultRandom(),
-  name: text(),
+  name: text().notNull(),
   type: transactionTypeEnum("type").notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   category: transactionCategoryEnum("category").notNull(),
