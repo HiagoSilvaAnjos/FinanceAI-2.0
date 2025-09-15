@@ -1,15 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { TrashIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   TRANSACTION_CATEGORY_LABELS,
   TRANSACTION_PAYMENT_METHOD_LABELS,
 } from "@/constants/transactions";
 import { Transaction } from "@/types/transaction";
 
+import DeleteTransactionButton from "../components/delete-transaction-button";
 import EditTransactionButton from "../components/edit-transaction-button";
 import TransactioTypeBadge from "../components/type-badge";
 
@@ -65,15 +64,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
       const transaction = row.row.original;
 
       return (
-        <div>
+        <div className="flex items-center gap-2">
           <EditTransactionButton transaction={transaction} />
-          <Button
-            size="icon"
-            variant={"ghost"}
-            className="space-x-1 text-muted-foreground"
-          >
-            <TrashIcon />
-          </Button>
+          <DeleteTransactionButton transactionId={transaction.id} />
         </div>
       );
     },
