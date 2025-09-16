@@ -19,17 +19,17 @@ const NavBar = () => {
           className={
             pathname === "/"
               ? "border-b-2 border-primary text-primary transition duration-300 ease-in-out"
-              : "text-muted-foreground"
+              : "border-b-2 border-transparent text-muted-foreground transition duration-300 ease-in-out hover:border-primary"
           }
         >
           Dashboard
         </Link>
         <Link
-          href={"/Transactions"}
+          href={"transactions"}
           className={
-            pathname === "/Transactions"
+            pathname === "/transactions"
               ? "border-b-2 border-primary text-primary transition duration-300 ease-in-out"
-              : "text-muted-foreground"
+              : "border-b-2 border-transparent text-muted-foreground transition duration-300 ease-in-out hover:border-primary"
           }
         >
           Transações
