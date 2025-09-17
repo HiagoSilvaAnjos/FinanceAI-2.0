@@ -2,9 +2,20 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   TRANSACTION_CATEGORY_LABELS,
+  TRANSACTION_CATEGORY_OPTIONS,
   TRANSACTION_PAYMENT_METHOD_LABELS,
+  TRANSACTION_PAYMENT_METHOD_OPTIONS,
+  TRANSACTION_TYPE_OPTIONS,
 } from "@/constants/transactions";
 import { Transaction } from "@/types/transaction";
 
@@ -15,32 +26,126 @@ import TransactioTypeBadge from "../components/type-badge";
 export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "name",
-    header: "Nome",
+    header: ({ column }) => (
+      <>
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+          Nome
+        </div>
+        <Input
+          placeholder="Filtrar por nome..."
+          value={(column.getFilterValue() as string) ?? ""}
+          onChange={(event) => column.setFilterValue(event.target.value)}
+          className="max-w-[300px]"
+        />
+      </>
+    ),
   },
   {
     accessorKey: "type",
-    header: "Tipo",
+    header: ({ column }) => (
+      <>
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+          Tipo
+        </div>
+        <Select
+          onValueChange={(value) => column.setFilterValue(value)}
+          value={(column.getFilterValue() as string) ?? ""}
+        >
+          <SelectTrigger className="h-8 w-[100px]">
+            <SelectValue placeholder="Todos" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {TRANSACTION_TYPE_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </>
+    ),
     cell: ({ row: { original: transaction } }) => {
       return <TransactioTypeBadge transaction={transaction} />;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (filterValue === "all" || !filterValue) return true;
+      return row.getValue(columnId) === filterValue;
     },
   },
   {
     accessorKey: "category",
-    header: "Categoria",
+    header: ({ column }) => (
+      <>
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+          Categoria
+        </div>
+        <Select
+          onValueChange={(value) => column.setFilterValue(value)}
+          value={(column.getFilterValue() as string) ?? ""}
+        >
+          <SelectTrigger className="h-8 w-[150px]">
+            <SelectValue placeholder="Todas" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas</SelectItem>
+            {TRANSACTION_CATEGORY_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </>
+    ),
     cell: ({ row: { original: transaction } }) => {
       return TRANSACTION_CATEGORY_LABELS[transaction.category];
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (filterValue === "all" || !filterValue) return true;
+      return row.getValue(columnId) === filterValue;
     },
   },
   {
     accessorKey: "paymentMethod",
-    header: "Método de Pagamento",
+    header: ({ column }) => (
+      <>
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+          Método de Pagamento
+        </div>
+        <Select
+          onValueChange={(value) => column.setFilterValue(value)}
+          value={(column.getFilterValue() as string) ?? ""}
+        >
+          <SelectTrigger className="h-8 w-[150px]">
+            <SelectValue placeholder="Todos" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {TRANSACTION_PAYMENT_METHOD_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </>
+    ),
     cell: ({ row: { original: transaction } }) => {
       return TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod];
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (filterValue === "all" || !filterValue) return true;
+      return row.getValue(columnId) === filterValue;
     },
   },
   {
     accessorKey: "date",
-    header: "Data",
+    header: () => (
+      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        Data
+      </div>
+    ),
     cell: ({ row: { original: transaction } }) =>
       new Date(transaction.date).toLocaleDateString("pt-BR", {
         day: "2-digit",
@@ -50,7 +155,11 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "amount",
-    header: "Valor",
+    header: () => (
+      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        Valor
+      </div>
+    ),
     cell: ({ row: { original: transaction } }) =>
       new Intl.NumberFormat("pt-BR", {
         style: "currency",
@@ -59,7 +168,11 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Ações",
+    header: () => (
+      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        Ações
+      </div>
+    ),
     cell: (row) => {
       const transaction = row.row.original;
 
