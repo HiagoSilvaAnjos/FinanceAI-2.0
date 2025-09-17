@@ -1,8 +1,11 @@
+"use client";
+
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TRANSACTION_CATEGORY_LABELS } from "@/constants/transactions";
 import { TotalExpensePerCategory } from "@/data/get-dashboard/types";
+import { formatCurrency } from "@/lib/currency"; // Importação da função de formatação
 
 interface ExpensesPerCategoryProps {
   expensesPerCategory: TotalExpensePerCategory[];
@@ -13,7 +16,7 @@ const ExpensesPerCategory = ({
 }: ExpensesPerCategoryProps) => {
   return (
     <ScrollArea className="col-span-2 h-full rounded-md border pb-6">
-      <CardHeader className="mb-2 mt-4">
+      <CardHeader className="mb-4 mt-4">
         <CardTitle className="font-semibold">
           Seus gastos por categoria
         </CardTitle>
@@ -27,11 +30,14 @@ const ExpensesPerCategory = ({
                 <p className="text-sm font-bold">
                   {TRANSACTION_CATEGORY_LABELS[category.category]}
                 </p>
-                <p className="text-sm font-bold">
-                  {category.percentageOfTotal}%
-                </p>
+                <div className="flex gap-2 text-sm font-bold">
+                  <p>{category.percentageOfTotal}%</p>
+                </div>
               </div>
               <Progress value={category.percentageOfTotal} />
+              <p className="text-muted-foreground">
+                Total: {formatCurrency(category.totalAmount)}
+              </p>
             </div>
           ))
         ) : (
