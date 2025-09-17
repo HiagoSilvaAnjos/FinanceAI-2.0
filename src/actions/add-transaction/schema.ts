@@ -13,7 +13,7 @@ export const upsertTransactionSchema = z.object({
       message: "O valor deve ser maior que zero",
     }),
 
-  type: z.enum(["DEPOSIT", "EXPENSE", "INVESTIMENT"], {
+  type: z.enum(["DEPOSIT", "EXPENSE"], {
     message: "Tipo de transação inválido",
   }),
 

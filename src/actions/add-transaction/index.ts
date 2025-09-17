@@ -32,7 +32,7 @@ export const upsertTransaction = async (params: UpsertTransactionParams) => {
   const transactionData = {
     name: params.name,
     amount: params.amount.toString(),
-    type: params.type as "DEPOSIT" | "EXPENSE" | "INVESTIMENT",
+    type: params.type as "DEPOSIT" | "EXPENSE",
     category: params.category as
       | "HOUSING"
       | "TRANSPORTATION"
