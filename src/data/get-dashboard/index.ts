@@ -59,17 +59,20 @@ export const getDashboard = async (month: string) => {
 
   const balance = depositsTotal - investmentsTotal - expensesTotal;
 
-  // Percentuais por tipo
+  // Percentuais por tipo - Adicionando a verificação para evitar NaN
   const typesPercentage: TransactionPercentagePerType = {
-    [TRANSACTION_TYPES.DEPOSIT]: Math.round(
-      (Number(depositsTotal || 0) / Number(transactionsTotal)) * 100,
-    ),
-    [TRANSACTION_TYPES.EXPENSE]: Math.round(
-      (Number(expensesTotal || 0) / Number(transactionsTotal)) * 100,
-    ),
-    [TRANSACTION_TYPES.INVESTIMENT]: Math.round(
-      (Number(investmentsTotal || 0) / Number(transactionsTotal)) * 100,
-    ),
+    [TRANSACTION_TYPES.DEPOSIT]:
+      transactionsTotal > 0
+        ? Math.round((depositsTotal / transactionsTotal) * 100)
+        : 0,
+    [TRANSACTION_TYPES.EXPENSE]:
+      transactionsTotal > 0
+        ? Math.round((expensesTotal / transactionsTotal) * 100)
+        : 0,
+    [TRANSACTION_TYPES.INVESTIMENT]:
+      transactionsTotal > 0
+        ? Math.round((investmentsTotal / transactionsTotal) * 100)
+        : 0,
   };
 
   // Total de despesas por categoria
@@ -86,9 +89,10 @@ export const getDashboard = async (month: string) => {
     expensesByCategory.map((category) => ({
       category: category.category,
       totalAmount: Number(category.totalAmount),
-      percentageOfTotal: Math.round(
-        (Number(category.totalAmount) / Number(expensesTotal)) * 100,
-      ),
+      percentageOfTotal:
+        expensesTotal > 0
+          ? Math.round((Number(category.totalAmount) / expensesTotal) * 100)
+          : 0,
     }));
 
   // Últimas transações

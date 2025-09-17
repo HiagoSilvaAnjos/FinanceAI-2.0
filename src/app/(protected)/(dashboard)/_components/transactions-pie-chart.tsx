@@ -61,26 +61,37 @@ const TransactionsPieChart = ({
     },
   ];
 
+  const hasTransactions =
+    depositsTotal > 0 || expensesTotal > 0 || investmentsTotal > 0;
+
   return (
     <Card className="flex flex-col p-12">
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={true}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="amount"
-              nameKey="type"
-              innerRadius={60}
-            />
-          </PieChart>
-        </ChartContainer>
+        {hasTransactions ? (
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={true}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Pie
+                data={chartData}
+                dataKey="amount"
+                nameKey="type"
+                innerRadius={60}
+              />
+            </PieChart>
+          </ChartContainer>
+        ) : (
+          <div className="flex h-[250px] items-center justify-center">
+            <p className="text-sm text-muted-foreground">
+              Nenhuma transação encontrada para este período.
+            </p>
+          </div>
+        )}
 
         <div className="space-y-3">
           <PercentageItem
