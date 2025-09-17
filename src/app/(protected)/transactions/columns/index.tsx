@@ -28,7 +28,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     accessorKey: "name",
     header: ({ column }) => (
       <>
-        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:!text-white">
           Nome
         </div>
         <Input

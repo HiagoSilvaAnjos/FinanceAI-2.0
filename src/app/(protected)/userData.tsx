@@ -42,12 +42,14 @@ const User = () => {
   const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
 
   useEffect(() => {
-    const html = document.documentElement;
+    const body = document.documentElement;
     if (isDarkMode) {
-      html.classList.remove("light");
+      body.classList.remove("light");
+      body.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
-      html.classList.add("light");
+      body.classList.remove("dark");
+      body.classList.add("light");
       localStorage.setItem("theme", "light");
     }
   }, [isDarkMode]);
@@ -92,7 +94,7 @@ const User = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-1 py-2 transition ease-in-out hover:bg-zinc-900">
+        <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-2 py-2 transition ease-in-out hover:bg-zinc-900">
           <Avatar>
             <AvatarImage src={session?.user?.image as string | undefined} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>

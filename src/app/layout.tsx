@@ -22,20 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-            (function() {
-              const savedTheme = localStorage.getItem('theme');
-              if (savedTheme === 'light') {
-                document.documentElement.classList.add('light');
-              }
-            })();
-          `,
-          }}
-        />
-      </head>
+      <head></head>
       <body
         className={`${roboto.className} antialiased transition-colors duration-500`}
       >
