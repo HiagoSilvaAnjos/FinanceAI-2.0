@@ -21,18 +21,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="pt-BR">
       <head>
-        <script>
-          {`
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
             (function() {
-              const theme = localStorage.getItem('theme');
-              if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
+              const savedTheme = localStorage.getItem('theme');
+              if (savedTheme === 'light') {
+                document.documentElement.classList.add('light');
               }
             })();
-          `}
-        </script>
+          `,
+          }}
+        />
       </head>
       <body
         className={`${roboto.className} antialiased transition-colors duration-500`}

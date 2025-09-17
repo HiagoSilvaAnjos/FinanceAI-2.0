@@ -27,23 +27,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 
+const getInitialTheme = () => {
+  if (typeof window !== "undefined") {
+    const saved = localStorage.getItem("theme");
+    return saved === "dark" || saved === null;
+  }
+  return true;
+};
+
 const User = () => {
   const { data: session } = authClient.useSession();
 
   const [signOutIsLoading, setSignOutIsLoading] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState("dark");
+  const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    setCurrentTheme(savedTheme);
-    document.documentElement.className = savedTheme;
-  }, []);
+    const html = document.documentElement;
+    if (isDarkMode) {
+      html.classList.remove("light");
+      localStorage.setItem("theme", "dark");
+    } else {
+      html.classList.add("light");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
 
-  const handleThemeChange = (theme: string) => {
-    setCurrentTheme(theme);
-    localStorage.setItem("theme", theme);
-    document.documentElement.className = theme;
-  };
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
   const signOut = async () => {
     setSignOutIsLoading(true);
@@ -61,7 +70,6 @@ const User = () => {
     const filteredNameParts = nameParts.filter(
       (part) => !ignoredWords.includes(part.toLowerCase()),
     );
-
     if (filteredNameParts.length > 1) {
       return `${filteredNameParts[0]} ${filteredNameParts[1]}`;
     }
@@ -84,7 +92,7 @@ const User = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-2 py-2 transition ease-in-out hover:bg-zinc-900">
+        <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-1 py-2 transition ease-in-out hover:bg-zinc-900">
           <Avatar>
             <AvatarImage src={session?.user?.image as string | undefined} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
@@ -107,14 +115,14 @@ const User = () => {
             <DropdownMenuPortal>
               <DropdownMenuSubContent sideOffset={10} className="w-25">
                 <DropdownMenuItem
-                  className={`flex cursor-pointer justify-between ${currentTheme === "light" ? "bg-accent" : ""}`}
-                  onClick={() => handleThemeChange("light")}
+                  className={`flex cursor-pointer justify-between ${!isDarkMode ? "bg-accent" : ""}`}
+                  onClick={() => toggleTheme()}
                 >
                   Claro <SunIcon />
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`flex cursor-pointer justify-between ${currentTheme === "dark" ? "bg-accent" : ""}`}
-                  onClick={() => handleThemeChange("dark")}
+                  className={`flex cursor-pointer justify-between ${isDarkMode ? "bg-accent" : ""}`}
+                  onClick={() => toggleTheme()}
                 >
                   Escuro <MoonIcon />
                 </DropdownMenuItem>

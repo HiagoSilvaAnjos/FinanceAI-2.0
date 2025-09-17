@@ -77,17 +77,20 @@ const SignUpForm = () => {
         onError: (ctx) => {
           if (ctx.error.code === "USER_ALREADY_EXISTS") {
             toast.error("E-mail já cadastrado.");
+            setIsSignUpLoading(false);
             return form.setError("email", {
               message: "E-mail já cadastrado.",
             });
           }
           if (ctx.error.code === "WEAK_PASSWORD") {
             toast.error("Senha muito fraca.");
+            setIsSignUpLoading(false);
             return form.setError("password", {
               message: "Senha muito fraca.",
             });
           }
           toast.error(ctx.error.message);
+          setIsSignUpLoading(false);
         },
       },
     });
