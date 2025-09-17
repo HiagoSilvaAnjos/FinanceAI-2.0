@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import {
   Select,
@@ -27,28 +28,64 @@ const MONTH_OPTIONS = [
 
 interface TimeSelectProps {
   selectedMonth: string;
+  selectedYear: string;
 }
 
-const TimeSelect = ({ selectedMonth }: TimeSelectProps) => {
+const TimeSelect = ({ selectedMonth, selectedYear }: TimeSelectProps) => {
   const { push } = useRouter();
 
-  const handleMonthChange = (month: string) => {
-    push(`/?month=${month}`);
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = currentYear; year >= 2024; year--) {
+      years.push({ value: String(year), label: String(year) });
+    }
+    return years;
   };
 
+  const handleDateChange = (type: "month" | "year", value: string) => {
+    const newMonth = type === "month" ? value : selectedMonth;
+    const newYear = type === "year" ? value : selectedYear;
+
+    push(`/?month=${newMonth}&year=${newYear}`);
+  };
+
+  const yearOptions = generateYearOptions();
+
   return (
-    <Select onValueChange={handleMonthChange} value={selectedMonth}>
-      <SelectTrigger className="w-[150px] rounded-full">
-        <SelectValue placeholder="Mês" />
-      </SelectTrigger>
-      <SelectContent>
-        {MONTH_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex gap-4">
+      <Select
+        onValueChange={(month) => handleDateChange("month", month)}
+        value={selectedMonth}
+      >
+        <SelectTrigger className="w-[150px] rounded-full">
+          <SelectValue placeholder="Mês" />
+        </SelectTrigger>
+        <SelectContent>
+          {MONTH_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        onValueChange={(year) => handleDateChange("year", year)}
+        value={selectedYear}
+      >
+        <SelectTrigger className="w-[100px] rounded-full">
+          <SelectValue placeholder="Ano" />
+        </SelectTrigger>
+        <SelectContent>
+          {yearOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
 

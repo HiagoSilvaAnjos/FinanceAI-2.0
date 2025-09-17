@@ -8,7 +8,7 @@ import { auth } from "@/lib/auth";
 
 import { TotalExpensePerCategory, TransactionPercentagePerType } from "./types";
 
-export const getDashboard = async (month: string) => {
+export const getDashboard = async (month: string, year: string) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -20,8 +20,8 @@ export const getDashboard = async (month: string) => {
   const userId = session.user.id;
 
   // Filtros de data
-  const startDate = new Date(`2025-${month}-01`);
-  const endDate = new Date(`2025-${month}-31`);
+  const startDate = new Date(`${year}-${month}-01`);
+  const endDate = new Date(`${year}-${month}-31`);
 
   const baseWhere = and(
     eq(transactionTable.userId, userId),
@@ -75,7 +75,7 @@ export const getDashboard = async (month: string) => {
         : 0,
   };
 
-  // Total de despesas por categoria
+  // Total de despesas por categoria - Adicionando a verificação para evitar NaN
   const expensesByCategory = await db
     .select({
       category: transactionTable.category,
