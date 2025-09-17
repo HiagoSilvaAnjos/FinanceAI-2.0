@@ -1,7 +1,14 @@
 "use client";
 
-import { LogOutIcon, MailIcon, MoonIcon, SunIcon } from "lucide-react";
+import {
+  LoaderCircleIcon,
+  LogOutIcon,
+  MailIcon,
+  MoonIcon,
+  SunIcon,
+} from "lucide-react";
 import { redirect } from "next/navigation";
+import { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,6 +29,15 @@ import { authClient } from "@/lib/auth-client";
 
 const User = () => {
   const { data: session } = authClient.useSession();
+
+  const [signOutIsLoading, setSignOutIsLoading] = useState(false);
+
+  const signOut = async () => {
+    setSignOutIsLoading(true);
+    await authClient.signOut();
+    setSignOutIsLoading(false);
+    redirect("/authentication");
+  };
 
   return (
     <DropdownMenu>
@@ -67,12 +83,11 @@ const User = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
-          onClick={() => {
-            authClient.signOut();
-            redirect("/authentication");
-          }}
+          onClick={signOut}
+          disabled={signOutIsLoading}
         >
-          Sair
+          Sair{" "}
+          {signOutIsLoading && <LoaderCircleIcon className="animate-spin" />}
           <DropdownMenuShortcut>
             <LogOutIcon size={20} />
           </DropdownMenuShortcut>
