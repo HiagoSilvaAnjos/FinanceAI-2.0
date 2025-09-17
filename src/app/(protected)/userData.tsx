@@ -31,10 +31,9 @@ const User = () => {
   const { data: session } = authClient.useSession();
 
   const [signOutIsLoading, setSignOutIsLoading] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState("dark"); // Estado inicial
+  const [currentTheme, setCurrentTheme] = useState("dark");
 
   useEffect(() => {
-    // Lê o tema do localStorage na primeira renderização
     const savedTheme = localStorage.getItem("theme") || "dark";
     setCurrentTheme(savedTheme);
     document.documentElement.className = savedTheme;
@@ -53,21 +52,45 @@ const User = () => {
     redirect("/authentication");
   };
 
+  const getDisplayedName = (fullName?: string) => {
+    if (!fullName) {
+      return "";
+    }
+    const nameParts = fullName.split(" ").filter((part) => part.length > 0);
+    const ignoredWords = ["da", "de", "do", "dos", "e", "das"];
+    const filteredNameParts = nameParts.filter(
+      (part) => !ignoredWords.includes(part.toLowerCase()),
+    );
+
+    if (filteredNameParts.length > 1) {
+      return `${filteredNameParts[0]} ${filteredNameParts[1]}`;
+    }
+    return filteredNameParts[0] || nameParts.join(" ");
+  };
+
+  const displayedName = getDisplayedName(session?.user?.name);
+
+  const getAvatarFallback = (fullName?: string) => {
+    if (!fullName) {
+      return "";
+    }
+    const nameParts = fullName.split(" ").filter((part) => part.length > 0);
+    const firstInitial = nameParts?.[0]?.[0] || "";
+    const secondInitial = nameParts.length > 1 ? nameParts[1][0] : "";
+    return firstInitial + secondInitial;
+  };
+  const avatarFallback = getAvatarFallback(session?.user?.name);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex cursor-pointer justify-between space-y-6 rounded-lg border border-white/55 px-4 py-2 transition ease-in-out hover:bg-zinc-900">
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage src={session?.user?.image as string | undefined} />
-              <AvatarFallback>
-                {session?.user?.name?.split(" ")?.[0]?.[0]}
-                {session?.user?.name?.split(" ")?.[1]?.[0]}
-              </AvatarFallback>
-            </Avatar>
+        <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-2 py-2 transition ease-in-out hover:bg-zinc-900">
+          <Avatar>
+            <AvatarImage src={session?.user?.image as string | undefined} />
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
+          </Avatar>
 
-            <h3 className="text-xs font-semibold">{session?.user?.name}</h3>
-          </div>
+          <h3 className="text-base font-medium">{displayedName}</h3>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64" align="end">
