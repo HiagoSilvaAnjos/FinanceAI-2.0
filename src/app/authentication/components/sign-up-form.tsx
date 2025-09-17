@@ -1,7 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LoaderCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -56,7 +58,10 @@ const SignUpForm = () => {
     },
   });
 
+  const [isSignUpLoading, setIsSignUpLoading] = useState(false);
+
   async function onSubmit(values: FormValues) {
+    setIsSignUpLoading(true);
     await authClient.signUp.email({
       email: values.email,
       password: values.password,
@@ -64,6 +69,10 @@ const SignUpForm = () => {
       fetchOptions: {
         onSuccess: () => {
           router.push("/");
+          setIsSignUpLoading(false);
+          toast.success("Conta criada com sucesso!", {
+            position: "bottom-left",
+          });
         },
         onError: (ctx) => {
           if (ctx.error.code === "USER_ALREADY_EXISTS") {
@@ -160,9 +169,17 @@ const SignUpForm = () => {
             <Button
               type="submit"
               variant={"default"}
-              className="text-foreground cursor-pointer"
+              className="cursor-pointer text-foreground"
+              disabled={isSignUpLoading}
             >
-              Criar na Conta
+              {isSignUpLoading ? (
+                <>
+                  <LoaderCircleIcon className="animate-spin" />
+                  &nbsp;Criando sua Conta...
+                </>
+              ) : (
+                "Criar na Conta"
+              )}
             </Button>
           </CardFooter>
         </form>
