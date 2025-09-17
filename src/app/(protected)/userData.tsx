@@ -8,7 +8,7 @@ import {
   SunIcon,
 } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -31,6 +31,20 @@ const User = () => {
   const { data: session } = authClient.useSession();
 
   const [signOutIsLoading, setSignOutIsLoading] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState("dark"); // Estado inicial
+
+  useEffect(() => {
+    // Lê o tema do localStorage na primeira renderização
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    setCurrentTheme(savedTheme);
+    document.documentElement.className = savedTheme;
+  }, []);
+
+  const handleThemeChange = (theme: string) => {
+    setCurrentTheme(theme);
+    localStorage.setItem("theme", theme);
+    document.documentElement.className = theme;
+  };
 
   const signOut = async () => {
     setSignOutIsLoading(true);
@@ -69,10 +83,16 @@ const User = () => {
             <DropdownMenuSubTrigger>Tema</DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent sideOffset={10} className="w-25">
-                <DropdownMenuItem className="flex cursor-pointer justify-between">
+                <DropdownMenuItem
+                  className={`flex cursor-pointer justify-between ${currentTheme === "light" ? "bg-accent" : ""}`}
+                  onClick={() => handleThemeChange("light")}
+                >
                   Claro <SunIcon />
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex cursor-pointer justify-between">
+                <DropdownMenuItem
+                  className={`flex cursor-pointer justify-between ${currentTheme === "dark" ? "bg-accent" : ""}`}
+                  onClick={() => handleThemeChange("dark")}
+                >
                   Escuro <MoonIcon />
                 </DropdownMenuItem>
               </DropdownMenuSubContent>

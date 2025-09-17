@@ -21,8 +21,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${roboto.className} dark antialiased`}>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script>
+          {`
+            (function() {
+              const theme = localStorage.getItem('theme');
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+              }
+            })();
+          `}
+        </script>
+      </head>
+      <body
+        className={`${roboto.className} antialiased transition-colors duration-500`}
+      >
         {children}
         <Toaster />
       </body>
