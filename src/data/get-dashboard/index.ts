@@ -57,9 +57,10 @@ export const getDashboard = async (month: string, year: string) => {
     .where(baseWhere);
   const transactionsTotal = Number(transactionsTotalResult[0]?.total || 0);
 
-  const balance = depositsTotal - investmentsTotal - expensesTotal;
+  // Lógica de saldo: depósitos - despesas
+  const balance = depositsTotal - expensesTotal;
 
-  // Percentuais por tipo - Adicionando a verificação para evitar NaN
+  // Percentuais por tipo
   const typesPercentage: TransactionPercentagePerType = {
     [TRANSACTION_TYPES.DEPOSIT]:
       transactionsTotal > 0
@@ -75,7 +76,7 @@ export const getDashboard = async (month: string, year: string) => {
         : 0,
   };
 
-  // Total de despesas por categoria - Adicionando a verificação para evitar NaN
+  // Total de despesas por categoria
   const expensesByCategory = await db
     .select({
       category: transactionTable.category,

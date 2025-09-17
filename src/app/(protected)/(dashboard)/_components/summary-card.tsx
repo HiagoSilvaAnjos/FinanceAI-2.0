@@ -1,6 +1,10 @@
-import React from "react";
+"use client";
+
+import { HelpCircle, XIcon } from "lucide-react";
+import React, { useState } from "react";
 
 import AddTransactionButton from "@/components/add-transaction-button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 interface SummaryCardProps {
@@ -8,6 +12,8 @@ interface SummaryCardProps {
   title: string;
   amount: number;
   size?: "small" | "large";
+  explanation?: string;
+  tooltipText?: string;
 }
 
 const SummaryCard = ({
@@ -15,27 +21,55 @@ const SummaryCard = ({
   title,
   amount,
   size = "small",
+  explanation,
+  tooltipText,
 }: SummaryCardProps) => {
+  const [showExplanation, setShowExplanation] = useState(false);
+
+  const handleToggleExplanation = () => {
+    setShowExplanation((prev) => !prev);
+  };
+
+  const formattedAmount = Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(amount);
+
   return (
     <Card className={`${size === "large" ? "bg-white bg-opacity-5" : ""}`}>
-      <CardHeader className="flex flex-row items-center gap-2">
-        {icon}
-        <p
-          className={` ${size === "small" ? "text-muted-foreground" : "text-white opacity-70"}`}
-        >
-          {title}
-        </p>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {icon}
+          <p
+            className={`font-medium ${size === "small" ? "text-sm text-white" : "text-white opacity-70"}`}
+          >
+            {title}
+          </p>
+        </div>
+        {explanation && (
+          <Button
+            variant="ghost"
+            title={tooltipText}
+            onClick={handleToggleExplanation}
+          >
+            {showExplanation ? (
+              <XIcon className="size-6 text-red-500" />
+            ) : (
+              <HelpCircle className="size-6" />
+            )}
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="flex justify-between">
-        <p
-          className={`font-bold ${size === "small" ? "text-2xl" : `text-4xl ${amount < 0 ? "text-red-600" : "text-primary"}`}`}
-        >
-          {Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(amount)}
-        </p>
-
+        {showExplanation ? (
+          <p className={`font-medium text-white`}>{explanation}</p>
+        ) : (
+          <p
+            className={`font-bold ${size === "small" ? "text-2xl" : `text-4xl ${amount < 0 ? "text-red-600" : "text-primary"}`}`}
+          >
+            {formattedAmount}
+          </p>
+        )}
         {size === "large" && <AddTransactionButton />}
       </CardContent>
     </Card>
