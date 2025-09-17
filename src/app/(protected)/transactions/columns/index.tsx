@@ -28,7 +28,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     accessorKey: "name",
     header: ({ column }) => (
       <>
-        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
           Nome
         </div>
         <Input
@@ -44,7 +44,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     accessorKey: "type",
     header: ({ column }) => (
       <>
-        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
           Tipo
         </div>
         <Select
@@ -77,7 +77,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     accessorKey: "category",
     header: ({ column }) => (
       <>
-        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
           Categoria
         </div>
         <Select
@@ -110,7 +110,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     accessorKey: "paymentMethod",
     header: ({ column }) => (
       <>
-        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+        <div className="mb-2 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
           Método de Pagamento
         </div>
         <Select
@@ -142,7 +142,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "date",
     header: () => (
-      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
         Data
       </div>
     ),
@@ -156,7 +156,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "amount",
     header: () => (
-      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
         Valor
       </div>
     ),
@@ -169,7 +169,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "actions",
     header: () => (
-      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium">
+      <div className="mb-10 mt-1 flex flex-col items-start gap-1 text-[16px] font-medium dark:text-white">
         Ações
       </div>
     ),
