@@ -65,12 +65,13 @@ const TransactionsPieChart = ({
     depositsTotal > 0 || expensesTotal > 0 || investmentsTotal > 0;
 
   return (
-    <Card className="flex flex-col p-12">
+    <Card className="flex flex-col p-6">
       <CardContent className="flex-1 pb-0">
         {hasTransactions ? (
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-h-[250px]"
+            // Adicionado max-w-sm para limitar a largura em telas maiores
+            className="mx-auto aspect-square max-w-sm"
           >
             <PieChart>
               <ChartTooltip
