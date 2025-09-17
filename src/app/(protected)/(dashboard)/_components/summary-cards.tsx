@@ -1,16 +1,10 @@
-import {
-  PiggyBankIcon,
-  TrendingDownIcon,
-  TrendingUpIcon,
-  WalletIcon,
-} from "lucide-react";
+import { TrendingDownIcon, TrendingUpIcon, WalletIcon } from "lucide-react";
 
 import SummaryCard from "./summary-card";
 
 interface SummaryCardsProps {
   balance: number;
   depositsTotal: number;
-  investmentsTotal: number;
   expensesTotal: number;
 }
 
@@ -18,11 +12,9 @@ const SummaryCards = async ({
   balance,
   depositsTotal,
   expensesTotal,
-  investmentsTotal,
 }: SummaryCardsProps) => {
   return (
     <div className="space-y-6">
-      {/* Primeiro card */}
       <SummaryCard
         icon={<WalletIcon size={16} />}
         title={"Saldo"}
@@ -32,16 +24,7 @@ const SummaryCards = async ({
         tooltipText="O saldo representa o valor que você tem disponível após todas as despesas."
       />
 
-      {/* Outros cards */}
-      <div className="grid grid-cols-3 gap-6">
-        <SummaryCard
-          icon={<PiggyBankIcon size={16} />}
-          title="Investido"
-          amount={investmentsTotal}
-          explanation="Seu total investido. Esse valor não é contabilizado no seu saldo."
-          tooltipText="O valor total investido mostra o quanto você alocou em investimentos."
-        />
-
+      <div className="grid grid-cols-2 gap-6">
         <SummaryCard
           icon={<TrendingUpIcon size={16} className="text-primary" />}
           title="Receita"

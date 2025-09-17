@@ -36,13 +36,6 @@ export const getDashboard = async (month: string, year: string) => {
     .where(and(baseWhere, eq(transactionTable.type, "DEPOSIT")));
   const depositsTotal = Number(depositsResult[0]?.total || 0);
 
-  // Investimentos totais
-  const investmentsResult = await db
-    .select({ total: sum(transactionTable.amount) })
-    .from(transactionTable)
-    .where(and(baseWhere, eq(transactionTable.type, "INVESTIMENT")));
-  const investmentsTotal = Number(investmentsResult[0]?.total || 0);
-
   // Despesas totais
   const expensesResult = await db
     .select({ total: sum(transactionTable.amount) })
@@ -51,16 +44,12 @@ export const getDashboard = async (month: string, year: string) => {
   const expensesTotal = Number(expensesResult[0]?.total || 0);
 
   // Total geral
-  const transactionsTotalResult = await db
-    .select({ total: sum(transactionTable.amount) })
-    .from(transactionTable)
-    .where(baseWhere);
-  const transactionsTotal = Number(transactionsTotalResult[0]?.total || 0);
+  const transactionsTotal = depositsTotal + expensesTotal;
 
-  // Lógica de saldo: depósitos - despesas
+  // O cálculo do saldo foi simplificado
   const balance = depositsTotal - expensesTotal;
 
-  // Percentuais por tipo
+  // Percentuais por tipo - Lógica ajustada para apenas Depósito e Despesa
   const typesPercentage: TransactionPercentagePerType = {
     [TRANSACTION_TYPES.DEPOSIT]:
       transactionsTotal > 0
@@ -69,10 +58,6 @@ export const getDashboard = async (month: string, year: string) => {
     [TRANSACTION_TYPES.EXPENSE]:
       transactionsTotal > 0
         ? Math.round((expensesTotal / transactionsTotal) * 100)
-        : 0,
-    [TRANSACTION_TYPES.INVESTIMENT]:
-      transactionsTotal > 0
-        ? Math.round((investmentsTotal / transactionsTotal) * 100)
         : 0,
   };
 
@@ -112,7 +97,6 @@ export const getDashboard = async (month: string, year: string) => {
   return {
     balance,
     depositsTotal,
-    investmentsTotal,
     expensesTotal,
     typesPercentage,
     totalExpensePerCategory,

@@ -14,7 +14,6 @@ import {
 export const transactionTypeEnum = pgEnum("transaction_type", [
   "DEPOSIT",
   "EXPENSE",
-  "INVESTIMENT",
 ]);
 
 export const transactionCategoryEnum = pgEnum("transaction_category", [
