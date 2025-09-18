@@ -1,12 +1,12 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import ComparisonChart from "@/components/comparison-chart";
+// import ComparisonChart from "@/components/comparison-chart";
 import MonthlyHistoryChart from "@/components/monthly-history-chart";
 import NavBar from "@/components/navbar";
 import { getDashboard } from "@/data/get-dashboard";
 import {
-  getComparisonData,
+  // getComparisonData,
   getHistoricalData,
 } from "@/data/get-historical-data";
 import { auth } from "@/lib/auth";
@@ -46,7 +46,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const historicalData = await getHistoricalData(selectedYear);
 
   // Buscar dados de comparação
-  const comparisonData = await getComparisonData(selectedMonth, selectedYear);
+  // const comparisonData = await getComparisonData(selectedMonth, selectedYear);
 
   return (
     <div>
@@ -83,7 +83,7 @@ export default async function Home({ searchParams }: HomeProps) {
           />
 
           {/* Gráficos de comparação */}
-          <ComparisonChart data={comparisonData} />
+          {/* <ComparisonChart data={comparisonData} /> */}
         </div>
       </div>
     </div>

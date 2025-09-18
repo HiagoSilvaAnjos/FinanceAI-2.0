@@ -40,14 +40,18 @@ const MonthlyHistoryChart = ({
     Saldo: item.balance,
   }));
 
-  // Tooltip customizado
+  // Tooltip customizado com cor de fundo personalizada
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-lg border bg-background p-3 shadow-md">
-          <p className="font-medium">{`${label} ${selectedYear}`}</p>
+        <div className="rounded-lg border border-gray-300 bg-background p-3 shadow-lg dark:border-gray-600">
+          <p className="mb-2 font-medium text-gray-900 dark:text-white">{`${label} ${selectedYear}`}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
+            <p
+              key={index}
+              className="mt-1 text-sm text-gray-700 dark:text-gray-300"
+              style={{ color: entry.color }}
+            >
               {`${entry.dataKey}: ${formatCurrency(entry.value)}`}
             </p>
           ))}
@@ -77,7 +81,10 @@ const MonthlyHistoryChart = ({
               tickLine={false}
               tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "rgba(255, 255, 255, 0.1)" }}
+            />
             <Legend />
             <Bar
               dataKey="Receitas"
