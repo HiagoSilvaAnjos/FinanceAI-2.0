@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   decimal,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -103,6 +104,25 @@ export const verificationTable = pgTable("verification", {
   ),
 });
 
+// Nova tabela para grupos de parcelas
+export const installmentGroupTable = pgTable("installment_group", {
+  id: uuid().primaryKey().defaultRandom(),
+  originalName: text("original_name").notNull(), // Nome original da transação
+  originalAmount: decimal("original_amount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(), // Valor total original
+  totalInstallments: integer("total_installments").notNull(), // Total de parcelas
+  type: transactionTypeEnum("type").notNull(),
+  category: transactionCategoryEnum("category").notNull(),
+  paymentMethod: transactionPaymentMethodEnum("payment_method").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  userId: text("user_id")
+    .references(() => userTable.id, { onDelete: "cascade" })
+    .notNull(),
+});
+
 export const transactionTable = pgTable("transaction", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
@@ -116,15 +136,38 @@ export const transactionTable = pgTable("transaction", {
   userId: text("user_id")
     .references(() => userTable.id, { onDelete: "cascade" })
     .notNull(),
+
+  // Campos para vincular às parcelas
+  installmentGroupId: uuid("installment_group_id").references(
+    () => installmentGroupTable.id,
+    { onDelete: "cascade" },
+  ),
+  installmentNumber: integer("installment_number"),
 });
 
 export const usersRelations = relations(userTable, ({ many }) => ({
   transactions: many(transactionTable),
+  installmentGroups: many(installmentGroupTable),
 }));
+
+export const installmentGroupRelations = relations(
+  installmentGroupTable,
+  ({ one, many }) => ({
+    user: one(userTable, {
+      fields: [installmentGroupTable.userId],
+      references: [userTable.id],
+    }),
+    transactions: many(transactionTable),
+  }),
+);
 
 export const transactionsRelations = relations(transactionTable, ({ one }) => ({
   user: one(userTable, {
     fields: [transactionTable.userId],
     references: [userTable.id],
+  }),
+  installmentGroup: one(installmentGroupTable, {
+    fields: [transactionTable.installmentGroupId],
+    references: [installmentGroupTable.id],
   }),
 }));
