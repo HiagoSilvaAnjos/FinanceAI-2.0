@@ -19,3 +19,10 @@ export type TransactionWithInstallments = Transaction & {
 export type InstallmentGroupWithTransactions = InstallmentGroup & {
   transactions: Transaction[];
 };
+
+// Tipo para o formulário que pode incluir dados de parcela
+export type TransactionFormData = Transaction & {
+  installmentGroup?: InstallmentGroup;
+  installmentGroupId?: string | null;
+  installmentNumber?: number | null;
+};

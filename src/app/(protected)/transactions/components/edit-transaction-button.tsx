@@ -5,10 +5,10 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import UpsertTransactionDialog from "@/components/upsert-transaction-dialog";
-import { Transaction } from "@/types/transaction";
+import { TransactionFormData } from "@/types/transaction";
 
 interface EditTransactionButtonProps {
-  transaction: Transaction;
+  transaction: TransactionFormData;
 }
 
 const EditTransactionButton = ({ transaction }: EditTransactionButtonProps) => {
@@ -27,6 +27,7 @@ const EditTransactionButton = ({ transaction }: EditTransactionButtonProps) => {
         defaultValues={{
           ...transaction,
           amount: Number(transaction.amount),
+          installmentGroup: transaction.installmentGroup,
         }}
         isOpen={dialogIsOpen}
         setIsOpen={setDialogIsOpen}

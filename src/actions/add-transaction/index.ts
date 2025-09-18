@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { eq } from "drizzle-orm";
@@ -143,7 +144,7 @@ async function handleTransactionCreate(
     // Inserir todas as transações parceladas
     await db.insert(transactionTable).values(transactionsToCreate);
   } else {
-    // Transação única
+    // Transação única (não é cartão de crédito ou é só 1 parcela)
     await db.insert(transactionTable).values({
       name: params.name,
       amount: params.amount.toString(),
@@ -242,7 +243,6 @@ async function handleTransactionUpdate(
 
 // Função para lidar com atualizações de parcelas
 async function handleInstallmentUpdate(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   currentTransaction: any,
   params: UpsertTransactionParams,
   userId: string,
@@ -293,15 +293,16 @@ async function handleInstallmentUpdate(
   }
 
   // Se manteve cartão de crédito, atualizar o grupo e todas as parcelas
-  const newInstallmentAmount =
-    params.amount / installmentGroup.totalInstallments;
+  // CORREÇÃO: Usar o valor original do grupo, não o valor da parcela individual
+  const totalAmount = params.amount; // Este é o valor total que o usuário quer
+  const newInstallmentAmount = totalAmount / installmentGroup.totalInstallments;
 
   // Atualizar o grupo de parcelas
   await db
     .update(installmentGroupTable)
     .set({
       originalName: params.name,
-      originalAmount: params.amount.toString(),
+      originalAmount: totalAmount.toString(), // Salvar o valor total
       type: params.type as "DEPOSIT" | "EXPENSE",
       category: params.category as
         | "HOUSING"
@@ -334,6 +335,7 @@ async function handleInstallmentUpdate(
     await db
       .update(transactionTable)
       .set({
+        // CORREÇÃO: Usar o nome original, não adicionar sufixo sobre sufixo
         name: `${params.name} (${installment.installmentNumber}/${installmentGroup.totalInstallments})`,
         amount: newInstallmentAmount.toString(),
         type: params.type as "DEPOSIT" | "EXPENSE",

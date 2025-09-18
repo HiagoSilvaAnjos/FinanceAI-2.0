@@ -96,10 +96,14 @@ async function handleInstallmentDeletion(transaction: any) {
     } else {
       // Atualizar o total de parcelas no grupo
       const newTotalInstallments = remainingInstallments.length;
+      const newOriginalAmount =
+        newTotalInstallments * parseFloat(remainingInstallments[0].amount);
+
       await db
         .update(installmentGroupTable)
         .set({
           totalInstallments: newTotalInstallments,
+          originalAmount: newOriginalAmount.toString(),
           updatedAt: new Date(),
         })
         .where(eq(installmentGroupTable.id, installmentGroup.id));

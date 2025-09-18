@@ -46,10 +46,23 @@ import {
 
 type FormSchema = z.infer<typeof upsertTransactionSchema>;
 
+// No início do arquivo, após as importações, adicione:
+interface ExtendedFormSchema extends FormSchema {
+  installmentGroupId?: string | null;
+  installmentGroup?: {
+    id: string;
+    originalName: string;
+    originalAmount: string;
+    totalInstallments: number;
+  };
+  installmentNumber?: number | null;
+}
+
+// Depois altere a interface do componente:
 interface UpsertTransactionDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  defaultValues?: FormSchema;
+  defaultValues?: ExtendedFormSchema;
   transactionId?: string;
 }
 
@@ -59,12 +72,27 @@ const UpsertTransactionDialog = ({
   transactionId,
   defaultValues,
 }: UpsertTransactionDialogProps) => {
+  // Verificar se é uma transação parcelada
+  const isInstallmentTransaction =
+    defaultValues?.installmentGroupId !== null &&
+    defaultValues?.installmentGroupId !== undefined;
+
   const form = useForm<FormSchema>({
     resolver: zodResolver(upsertTransactionSchema),
     defaultValues: defaultValues
       ? {
           ...defaultValues,
           date: new Date(defaultValues.date),
+          // Se for parcela, usar o valor total original dividido pelas parcelas para mostrar o valor total
+          amount:
+            isInstallmentTransaction && defaultValues.installmentGroup
+              ? Number(defaultValues.installmentGroup.originalAmount)
+              : defaultValues.amount,
+          // Se for parcela, usar o nome original sem o sufixo
+          name:
+            isInstallmentTransaction && defaultValues.installmentGroup
+              ? defaultValues.installmentGroup.originalName
+              : defaultValues.name,
         }
       : {
           amount: 0,
@@ -85,10 +113,20 @@ const UpsertTransactionDialog = ({
       form.reset({
         ...defaultValues,
         date: new Date(defaultValues.date),
+        // Se for parcela, usar o valor total original
+        amount:
+          isInstallmentTransaction && defaultValues.installmentGroup
+            ? Number(defaultValues.installmentGroup.originalAmount)
+            : defaultValues.amount,
+        // Se for parcela, usar o nome original sem o sufixo
+        name:
+          isInstallmentTransaction && defaultValues.installmentGroup
+            ? defaultValues.installmentGroup.originalName
+            : defaultValues.name,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, defaultValues]);
+  }, [isOpen, defaultValues, isInstallmentTransaction]);
 
   const onSubmit = async (data: FormSchema) => {
     const isUpdate = Boolean(transactionId);
@@ -165,7 +203,9 @@ const UpsertTransactionDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Valor da transação
+                    {isCreditCard
+                      ? "Valor total somando suas parcelas"
+                      : "Valor da transação"}
                     {isCreditCard &&
                       form.watch("installments") &&
                       form.watch("installments")! > 1 && (
@@ -248,8 +288,19 @@ const UpsertTransactionDialog = ({
               name="paymentMethod"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Forma de pagamento</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <FormLabel>
+                    Forma de pagamento
+                    {isInstallmentTransaction && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        (Transação parcelada - não editável)
+                      </span>
+                    )}
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={isInstallmentTransaction}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione um método de pagamento..." />
@@ -268,8 +319,8 @@ const UpsertTransactionDialog = ({
               )}
             />
 
-            {/* Campo de parcelas - só aparece para cartão de crédito */}
-            {isCreditCard && (
+            {/* Campo de parcelas - só aparece para cartão de crédito E não for transação parcelada existente */}
+            {isCreditCard && !isInstallmentTransaction && (
               <FormField
                 control={form.control}
                 name="installments"
@@ -310,6 +361,33 @@ const UpsertTransactionDialog = ({
                   </FormItem>
                 )}
               />
+            )}
+
+            {/* Mostrar informações da parcela se for transação parcelada */}
+            {isInstallmentTransaction && defaultValues?.installmentGroup && (
+              <div className="rounded-lg border bg-muted p-4">
+                <h4 className="mb-2 font-semibold">Informações da Parcela</h4>
+                <div className="space-y-1 text-sm">
+                  <p>
+                    <span className="font-medium">Parcela:</span>{" "}
+                    {defaultValues.installmentNumber} de{" "}
+                    {defaultValues.installmentGroup.totalInstallments}
+                  </p>
+                  <p>
+                    <span className="font-medium">Valor por parcela:</span>{" "}
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(
+                      Number(defaultValues.installmentGroup.originalAmount) /
+                        defaultValues.installmentGroup.totalInstallments,
+                    )}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Alterações afetarão todas as parcelas desta compra
+                  </p>
+                </div>
+              </div>
             )}
 
             <FormField

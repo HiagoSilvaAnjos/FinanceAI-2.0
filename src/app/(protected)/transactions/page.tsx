@@ -20,10 +20,12 @@ const TransactionsPage = async () => {
     redirect("/authentication");
   }
 
-  const transactions = await db
-    .select()
-    .from(transactionTable)
-    .where(eq(transactionTable.userId, session.user.id));
+  const transactions = await db.query.transactionTable.findMany({
+    where: eq(transactionTable.userId, session.user.id),
+    with: {
+      installmentGroup: true,
+    },
+  });
 
   console.log(transactions);
 
