@@ -44,16 +44,14 @@ import {
   SelectValue,
 } from "./ui/select";
 
+type FormSchema = z.infer<typeof upsertTransactionSchema>;
+
 interface UpsertTransactionDialogProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   defaultValues?: FormSchema;
   transactionId?: string;
 }
-
-const formSchema = upsertTransactionSchema;
-
-type FormSchema = z.infer<typeof formSchema>;
 
 const UpsertTransactionDialog = ({
   isOpen,
@@ -62,7 +60,7 @@ const UpsertTransactionDialog = ({
   defaultValues,
 }: UpsertTransactionDialogProps) => {
   const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(upsertTransactionSchema),
     defaultValues: defaultValues
       ? {
           ...defaultValues,
@@ -77,6 +75,10 @@ const UpsertTransactionDialog = ({
           type: "EXPENSE",
         },
   });
+
+  // Observar mudanças no método de pagamento
+  const paymentMethod = form.watch("paymentMethod");
+  const isCreditCard = paymentMethod === "CREDIT_CARD";
 
   useEffect(() => {
     if (isOpen && defaultValues) {
@@ -94,9 +96,22 @@ const UpsertTransactionDialog = ({
       await upsertTransaction({ ...data, id: transactionId });
       setIsOpen(false);
       form.reset();
-      toast.success(
-        `Transação ${isUpdate ? "editada" : "adicionada"} com sucesso.`,
-      );
+
+      // Mensagem personalizada para transações parceladas
+      if (
+        !isUpdate &&
+        data.paymentMethod === "CREDIT_CARD" &&
+        data.installments &&
+        data.installments > 1
+      ) {
+        toast.success(
+          `${data.installments} transações criadas com sucesso (parcelado).`,
+        );
+      } else {
+        toast.success(
+          `Transação ${isUpdate ? "editada" : "adicionada"} com sucesso.`,
+        );
+      }
     } catch (error) {
       console.log(error);
       toast.error(
@@ -143,12 +158,23 @@ const UpsertTransactionDialog = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Valor da transação</FormLabel>
+                  <FormLabel>
+                    Valor da transação
+                    {isCreditCard &&
+                      form.watch("installments") &&
+                      form.watch("installments")! > 1 && (
+                        <span className="ml-2 text-sm text-muted-foreground">
+                          (Valor total - será dividido em{" "}
+                          {form.watch("installments")} parcelas)
+                        </span>
+                      )}
+                  </FormLabel>
 
                   <FormControl>
                     <MoneyInput
@@ -173,13 +199,10 @@ const UpsertTransactionDialog = ({
                 <FormItem>
                   <FormLabel>Tipo da transação</FormLabel>
 
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
+                        <SelectValue placeholder="Selecione o tipo..." />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -201,10 +224,7 @@ const UpsertTransactionDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categoria da transação</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione uma categoria..." />
@@ -229,10 +249,7 @@ const UpsertTransactionDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Forma de pagamento</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione um método de pagamento..." />
@@ -251,12 +268,65 @@ const UpsertTransactionDialog = ({
               )}
             />
 
+            {/* Campo de parcelas - só aparece para cartão de crédito */}
+            {isCreditCard && (
+              <FormField
+                control={form.control}
+                name="installments"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de parcelas</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o número de parcelas..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Array.from({ length: 24 }, (_, i) => i + 1).map(
+                          (num) => (
+                            <SelectItem key={num} value={num.toString()}>
+                              {num}x
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    {field.value &&
+                      field.value > 1 &&
+                      form.watch("amount") > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Cada parcela:{" "}
+                          {new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(form.watch("amount") / field.value)}
+                        </p>
+                      )}
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Data</FormLabel>
+                  <FormLabel>
+                    Data
+                    {isCreditCard &&
+                      form.watch("installments") &&
+                      form.watch("installments")! > 1 && (
+                        <span className="ml-2 text-sm text-muted-foreground">
+                          (Data da primeira parcela)
+                        </span>
+                      )}
+                  </FormLabel>
                   <DatePicker value={field.value} onChange={field.onChange} />
                   <FormMessage />
                 </FormItem>

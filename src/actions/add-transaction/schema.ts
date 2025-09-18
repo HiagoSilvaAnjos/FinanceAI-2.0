@@ -50,4 +50,7 @@ export const upsertTransactionSchema = z.object({
   ),
 
   date: z.date(),
+
+  // Campo opcional para parcelas
+  installments: z.number().min(1).max(24).optional(),
 });
