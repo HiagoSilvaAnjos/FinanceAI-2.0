@@ -4,7 +4,7 @@
 
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { Download, FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -258,7 +258,7 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
     <Button
       onClick={handleGenerateReport}
       disabled={isGenerating}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
       variant="outline"
     >
       {isGenerating ? (
@@ -267,7 +267,7 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
         <FileText className="h-4 w-4" />
       )}
       {isGenerating ? "Gerando..." : "Gerar Relatório com IA"}
-      <Download className="h-4 w-4" />
+      <Sparkles className="h-4 w-4" />
     </Button>
   );
 };

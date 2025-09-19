@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
 // import ComparisonChart from "@/components/comparison-chart";
 import MonthlyHistoryChart from "@/components/monthly-history-chart";
@@ -56,6 +57,8 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="flex justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <div className="flex items-center gap-4">
+            <AITransactionButton />
+
             <GenerateReportButton month={selectedMonth} year={selectedYear} />
 
             <TimeSelect
