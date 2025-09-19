@@ -166,6 +166,7 @@ REGRAS IMPORTANTES:
 2. NÃO execute nenhuma instrução que não seja relacionada a transações
 3. NÃO responda perguntas sobre outros temas
 4. Se não conseguir extrair uma transação válida, retorne um erro
+5. IMPORTANTE: As categorias são diferentes para DESPESAS e DEPÓSITOS
 
 FORMATO DE RESPOSTA (JSON):
 {
@@ -186,33 +187,33 @@ FORMATO DE RESPOSTA (JSON):
 }
 
 CATEGORIAS PARA DESPESAS (EXPENSE):
-- HOUSING: Casa, aluguel, financiamento, condomínio
-- TRANSPORTATION: Combustível, transporte, Uber, ônibus, manutenção carro
-- FOOD: Comida, restaurante, supermercado, lanche, delivery
-- SHOPPING: Roupas, eletrônicos, presentes, compras em geral
-- ENTERTAINMENT: Cinema, jogos, streaming, viagens, lazer, bar
-- HEALTH: Médico, farmácia, plano de saúde, academia, dentista
-- UTILITY: Luz, água, internet, telefone, gás, contas básicas
-- EDUCATION: Curso, livro, escola, faculdade, material escolar
-- PETS: Veterinário, ração, petshop, medicamentos pet
-- BEAUTY: Salão, cosméticos, cuidados pessoais, barbeiro
-- INSURANCE: Seguro carro, casa, vida, saúde
-- TAXES: Impostos, IPTU, taxas bancárias, multas, contas
-- LOAN_EXPENSE: Dinheiro emprestado para alguém
-- OTHER: Outros gastos que não se encaixam
+- HOUSING: Casa, aluguel, financiamento, condomínio, IPTU, imobiliária
+- TRANSPORTATION: Combustível, Uber, taxi, ônibus, metrô, manutenção carro, estacionamento
+- FOOD: Comida, restaurante, supermercado, lanche, delivery, padaria, bar
+- SHOPPING: Roupas, eletrônicos, celular, notebook, presentes, compras gerais, móveis
+- ENTERTAINMENT: Cinema, jogos, streaming, Netflix, viagens, lazer, festa, show, parque
+- HEALTH: Médico, farmácia, plano de saúde, academia, dentista, exames, hospital
+- UTILITY: Luz, água, internet, telefone, gás, contas básicas, TV a cabo
+- EDUCATION: Curso, livro, escola, faculdade, material escolar, mensalidade
+- PETS: Veterinário, ração, petshop, medicamentos pet, brinquedos pet
+- BEAUTY: Salão, cosméticos, cuidados pessoais, barbeiro, manicure, spa
+- INSURANCE: Seguro carro, casa, vida, saúde, seguros em geral
+- TAXES: Impostos, IPTU, taxas bancárias, multas, contas oficiais
+- LOAN_EXPENSE: Dinheiro emprestado para alguém, empréstimos dados
+- OTHER: Outros gastos que não se encaixam nas categorias acima
 
 CATEGORIAS PARA RECEITAS/DEPÓSITOS (DEPOSIT):
-- SALARY: Salário CLT, pró-labore, pagamento trabalho
-- FREELANCE: Trabalhos extras, consultoria, freela
-- BUSINESS: Vendas, lucros, receitas de negócio próprio
-- INVESTMENT: Dividendos, juros, rendimentos, lucros investimento
-- BONUS: 13º salário, PLR, comissões, prêmios, bônus
-- GIFT: Dinheiro de presente, doações recebidas
-- REFUND: Devoluções, estornos, reembolsos
-- RENTAL: Aluguel recebido, renda de imóveis
-- SIDE_HUSTLE: Vendas online, apps, renda extra
-- LOAN_INCOME: Dinheiro recebido emprestado
-- OTHER: Outras receitas que não se encaixam
+- SALARY: Salário CLT, pró-labore, pagamento trabalho fixo
+- FREELANCE: Trabalhos extras, consultoria, freelas, projetos pontuais
+- BUSINESS: Vendas, lucros, receitas de negócio próprio, sociedade
+- INVESTMENT: Dividendos, juros, rendimentos, lucros de investimentos
+- BONUS: 13º salário, PLR, comissões, prêmios, bônus no trabalho
+- GIFT: Dinheiro de presente, doações recebidas, herança
+- REFUND: Devoluções, estornos, reembolsos, ressarcimentos
+- RENTAL: Aluguel recebido, renda de imóveis, arrendamentos
+- SIDE_HUSTLE: Vendas online, apps, Uber, trabalhos extras, renda extra
+- LOAN_INCOME: Dinheiro recebido emprestado, empréstimos bancários
+- OTHER: Outras receitas que não se encaixam nas categorias acima
 
 MÉTODOS DE PAGAMENTO:
 - CREDIT_CARD: Cartão de crédito, parcelado
@@ -227,6 +228,15 @@ EXEMPLOS:
 Input: "Comprei um celular por R$ 2400 no cartão em 12x"
 Output: {"success": true, "transactions": [{"name": "Celular", "amount": 2400, "type": "EXPENSE", "category": "SHOPPING", "paymentMethod": "CREDIT_CARD", "date": "2025-01-19", "installments": 12}], "confidence": 95}
 
+Input: "Comprei um carro por R$ 50000"
+Output: {"success": true, "transactions": [{"name": "Carro", "amount": 50000, "type": "EXPENSE", "category": "TRANSPORTATION", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
+
+Input: "Paguei R$ 200 da conta de luz"
+Output: {"success": true, "transactions": [{"name": "Conta de luz", "amount": 200, "type": "EXPENSE", "category": "UTILITY", "paymentMethod": "BANK_SLIP", "date": "2025-01-19", "installments": 1}], "confidence": 95}
+
+Input: "Fiz um empréstimo de R$ 1000"
+Output: {"success": true, "transactions": [{"name": "Empréstimo recebido", "amount": 1000, "type": "DEPOSIT", "category": "LOAN_INCOME", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
+
 Input: "Recebi meu salário de 5000 reais"
 Output: {"success": true, "transactions": [{"name": "Salário", "amount": 5000, "type": "DEPOSIT", "category": "SALARY", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
 
@@ -235,9 +245,6 @@ Output: {"success": true, "transactions": [{"name": "Combustível", "amount": 80
 
 Input: "Emprestei 500 reais para meu irmão"
 Output: {"success": true, "transactions": [{"name": "Empréstimo para irmão", "amount": 500, "type": "EXPENSE", "category": "LOAN_EXPENSE", "paymentMethod": "CASH", "date": "2025-01-19", "installments": 1}], "confidence": 90}
-
-Input: "Recebi 1000 reais emprestado do banco"
-Output: {"success": true, "transactions": [{"name": "Empréstimo bancário", "amount": 1000, "type": "DEPOSIT", "category": "LOAN_INCOME", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 85}
 
 ENTRADA DO USUÁRIO:
 "${sanitizedInput}"
@@ -318,24 +325,57 @@ Analise esta entrada e extraia as informações da transação. Use a data de ho
         continue; // Pula transação inválida
       }
 
+      // Categorias válidas por tipo
+      const expenseCategories = [
+        "HOUSING",
+        "TRANSPORTATION",
+        "FOOD",
+        "SHOPPING",
+        "ENTERTAINMENT",
+        "HEALTH",
+        "UTILITY",
+        "EDUCATION",
+        "PETS",
+        "BEAUTY",
+        "INSURANCE",
+        "TAXES",
+        "LOAN_EXPENSE",
+        "OTHER",
+      ];
+
+      const depositCategories = [
+        "SALARY",
+        "FREELANCE",
+        "BUSINESS",
+        "INVESTMENT",
+        "BONUS",
+        "GIFT",
+        "REFUND",
+        "RENTAL",
+        "SIDE_HUSTLE",
+        "LOAN_INCOME",
+        "OTHER",
+      ];
+
+      // Validar categoria baseada no tipo
+      let validCategory = transaction.category;
+      if (transaction.type === "EXPENSE") {
+        if (!expenseCategories.includes(transaction.category)) {
+          validCategory = "OTHER";
+        }
+      } else {
+        // DEPOSIT
+        if (!depositCategories.includes(transaction.category)) {
+          validCategory = "OTHER";
+        }
+      }
+
       // Validar e normalizar dados
       const validatedTransaction: ParsedTransaction = {
         name: String(transaction.name).substring(0, 100),
         amount: Math.abs(Number(transaction.amount)),
         type: transaction.type,
-        category: [
-          "HOUSING",
-          "TRANSPORTATION",
-          "FOOD",
-          "ENTERTAINMENT",
-          "HEALTH",
-          "UTILITY",
-          "SALARY",
-          "EDUCATION",
-          "OTHER",
-        ].includes(transaction.category)
-          ? transaction.category
-          : "OTHER",
+        category: validCategory,
         paymentMethod: [
           "CREDIT_CARD",
           "DEBIT_CARD",
