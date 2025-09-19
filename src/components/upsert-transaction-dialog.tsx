@@ -10,7 +10,7 @@ import { z } from "zod";
 import { upsertTransaction } from "@/actions/add-transaction";
 import { upsertTransactionSchema } from "@/actions/add-transaction/schema";
 import {
-  TRANSACTION_CATEGORY_OPTIONS,
+  getCategoriesByType,
   TRANSACTION_PAYMENT_METHOD_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
 } from "@/constants/transactions";
@@ -104,9 +104,18 @@ const UpsertTransactionDialog = ({
         },
   });
 
-  // Observar mudanças no método de pagamento
+  // Observar mudanças no método de pagamento e tipo de transação
   const paymentMethod = form.watch("paymentMethod");
+  const transactionType = form.watch("type");
   const isCreditCard = paymentMethod === "CREDIT_CARD";
+
+  // Observar mudanças no tipo para resetar categoria
+  useEffect(() => {
+    if (transactionType && !defaultValues) {
+      // Reset category quando tipo muda (apenas para novas transações)
+      form.setValue("category", "OTHER");
+    }
+  }, [transactionType, form, defaultValues]);
 
   useEffect(() => {
     if (isOpen && defaultValues) {
@@ -159,6 +168,9 @@ const UpsertTransactionDialog = ({
   };
 
   const isUpdate = Boolean(transactionId);
+
+  // Obter categorias baseadas no tipo selecionado
+  const availableCategories = getCategoriesByType(transactionType);
 
   return (
     <Dialog
@@ -263,7 +275,12 @@ const UpsertTransactionDialog = ({
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Categoria da transação</FormLabel>
+                  <FormLabel>
+                    Categoria da transação
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      ({transactionType === "EXPENSE" ? "Despesa" : "Receita"})
+                    </span>
+                  </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -271,7 +288,7 @@ const UpsertTransactionDialog = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {TRANSACTION_CATEGORY_OPTIONS.map((option) => (
+                      {availableCategories.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>

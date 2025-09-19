@@ -21,14 +21,32 @@ export const transactionTypeEnum = pgEnum("transaction_type", [
 ]);
 
 export const transactionCategoryEnum = pgEnum("transaction_category", [
+  // Categorias para DESPESAS (EXPENSE)
   "HOUSING",
   "TRANSPORTATION",
   "FOOD",
+  "SHOPPING",
   "ENTERTAINMENT",
   "HEALTH",
   "UTILITY",
-  "SALARY",
   "EDUCATION",
+  "PETS",
+  "BEAUTY",
+  "INSURANCE",
+  "TAXES",
+  "LOAN_EXPENSE",
+  // Categorias para DEPÓSITOS (DEPOSIT)
+  "SALARY",
+  "FREELANCE",
+  "BUSINESS",
+  "INVESTMENT",
+  "BONUS",
+  "GIFT",
+  "REFUND",
+  "RENTAL",
+  "SIDE_HUSTLE",
+  "LOAN_INCOME",
+  // Fallback
   "OTHER",
 ]);
 

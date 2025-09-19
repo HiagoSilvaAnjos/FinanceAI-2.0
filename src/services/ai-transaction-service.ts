@@ -9,15 +9,32 @@ interface ParsedTransaction {
   name: string;
   amount: number;
   type: "DEPOSIT" | "EXPENSE";
-  category:
-    | "HOUSING"
+  category: // Categorias para DESPESAS (EXPENSE)
+  | "HOUSING"
     | "TRANSPORTATION"
     | "FOOD"
+    | "SHOPPING"
     | "ENTERTAINMENT"
     | "HEALTH"
     | "UTILITY"
-    | "SALARY"
     | "EDUCATION"
+    | "PETS"
+    | "BEAUTY"
+    | "INSURANCE"
+    | "TAXES"
+    | "LOAN_EXPENSE"
+    // Categorias para DEPÓSITOS (DEPOSIT)
+    | "SALARY"
+    | "FREELANCE"
+    | "BUSINESS"
+    | "INVESTMENT"
+    | "BONUS"
+    | "GIFT"
+    | "REFUND"
+    | "RENTAL"
+    | "SIDE_HUSTLE"
+    | "LOAN_INCOME"
+    // Fallback
     | "OTHER";
   paymentMethod:
     | "CREDIT_CARD"
@@ -124,7 +141,7 @@ export async function parseTransactionWithAI(
       return {
         success: false,
         transactions: [],
-        error: "Entrada contém padrões suspeitos de segurança.",
+        error: "Entrada Inválida!.",
         confidence: 0,
       };
     }
@@ -158,7 +175,7 @@ FORMATO DE RESPOSTA (JSON):
       "name": "nome da transação",
       "amount": valor_numerico,
       "type": "EXPENSE" | "DEPOSIT",
-      "category": "HOUSING|TRANSPORTATION|FOOD|ENTERTAINMENT|HEALTH|UTILITY|SALARY|EDUCATION|OTHER",
+      "category": "categoria_baseada_no_tipo",
       "paymentMethod": "CREDIT_CARD|DEBIT_CARD|BANK_TRANSFER|BANK_SLIP|CASH|PIX|OTHER",
       "date": "YYYY-MM-DD",
       "installments": numero_parcelas_ou_1
@@ -168,16 +185,34 @@ FORMATO DE RESPOSTA (JSON):
   "error": "mensagem de erro se houver"
 }
 
-CATEGORIAS:
-- HOUSING: Casa, aluguel, financiamento, contas da casa
-- TRANSPORTATION: Combustível, transporte, Uber, passagem
-- FOOD: Comida, restaurante, supermercado, lanche
-- ENTERTAINMENT: Cinema, jogos, streaming, lazer
-- HEALTH: Médico, farmácia, plano de saúde
-- UTILITY: Luz, água, internet, telefone
-- SALARY: Salário, renda, pagamento recebido
-- EDUCATION: Curso, livro, escola, faculdade
+CATEGORIAS PARA DESPESAS (EXPENSE):
+- HOUSING: Casa, aluguel, financiamento, condomínio
+- TRANSPORTATION: Combustível, transporte, Uber, ônibus, manutenção carro
+- FOOD: Comida, restaurante, supermercado, lanche, delivery
+- SHOPPING: Roupas, eletrônicos, presentes, compras em geral
+- ENTERTAINMENT: Cinema, jogos, streaming, viagens, lazer, bar
+- HEALTH: Médico, farmácia, plano de saúde, academia, dentista
+- UTILITY: Luz, água, internet, telefone, gás, contas básicas
+- EDUCATION: Curso, livro, escola, faculdade, material escolar
+- PETS: Veterinário, ração, petshop, medicamentos pet
+- BEAUTY: Salão, cosméticos, cuidados pessoais, barbeiro
+- INSURANCE: Seguro carro, casa, vida, saúde
+- TAXES: Impostos, IPTU, taxas bancárias, multas, contas
+- LOAN_EXPENSE: Dinheiro emprestado para alguém
 - OTHER: Outros gastos que não se encaixam
+
+CATEGORIAS PARA RECEITAS/DEPÓSITOS (DEPOSIT):
+- SALARY: Salário CLT, pró-labore, pagamento trabalho
+- FREELANCE: Trabalhos extras, consultoria, freela
+- BUSINESS: Vendas, lucros, receitas de negócio próprio
+- INVESTMENT: Dividendos, juros, rendimentos, lucros investimento
+- BONUS: 13º salário, PLR, comissões, prêmios, bônus
+- GIFT: Dinheiro de presente, doações recebidas
+- REFUND: Devoluções, estornos, reembolsos
+- RENTAL: Aluguel recebido, renda de imóveis
+- SIDE_HUSTLE: Vendas online, apps, renda extra
+- LOAN_INCOME: Dinheiro recebido emprestado
+- OTHER: Outras receitas que não se encaixam
 
 MÉTODOS DE PAGAMENTO:
 - CREDIT_CARD: Cartão de crédito, parcelado
@@ -185,14 +220,24 @@ MÉTODOS DE PAGAMENTO:
 - CASH: Dinheiro, à vista
 - PIX: PIX, transferência instantânea
 - BANK_TRANSFER: Transferência bancária, TED, DOC
+- BANK_SLIP: Boleto bancário
 - OTHER: Outros métodos
 
 EXEMPLOS:
 Input: "Comprei um celular por R$ 2400 no cartão em 12x"
-Output: {"success": true, "transactions": [{"name": "Celular", "amount": 2400, "type": "EXPENSE", "category": "OTHER", "paymentMethod": "CREDIT_CARD", "date": "2025-01-18", "installments": 12}], "confidence": 95}
+Output: {"success": true, "transactions": [{"name": "Celular", "amount": 2400, "type": "EXPENSE", "category": "SHOPPING", "paymentMethod": "CREDIT_CARD", "date": "2025-01-19", "installments": 12}], "confidence": 95}
 
 Input: "Recebi meu salário de 5000 reais"
-Output: {"success": true, "transactions": [{"name": "Salário", "amount": 5000, "type": "DEPOSIT", "category": "SALARY", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-18", "installments": 1}], "confidence": 90}
+Output: {"success": true, "transactions": [{"name": "Salário", "amount": 5000, "type": "DEPOSIT", "category": "SALARY", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
+
+Input: "Paguei R$ 80 de combustível no posto"
+Output: {"success": true, "transactions": [{"name": "Combustível", "amount": 80, "type": "EXPENSE", "category": "TRANSPORTATION", "paymentMethod": "CASH", "date": "2025-01-19", "installments": 1}], "confidence": 85}
+
+Input: "Emprestei 500 reais para meu irmão"
+Output: {"success": true, "transactions": [{"name": "Empréstimo para irmão", "amount": 500, "type": "EXPENSE", "category": "LOAN_EXPENSE", "paymentMethod": "CASH", "date": "2025-01-19", "installments": 1}], "confidence": 90}
+
+Input: "Recebi 1000 reais emprestado do banco"
+Output: {"success": true, "transactions": [{"name": "Empréstimo bancário", "amount": 1000, "type": "DEPOSIT", "category": "LOAN_INCOME", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 85}
 
 ENTRADA DO USUÁRIO:
 "${sanitizedInput}"

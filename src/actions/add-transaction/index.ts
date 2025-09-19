@@ -4,7 +4,6 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
@@ -29,7 +28,7 @@ export const upsertTransaction = async (params: UpsertTransactionParams) => {
   });
 
   if (!session?.user) {
-    redirect("/authentication");
+    throw new Error("Unauthorized");
   }
 
   const userId = session.user.id;
@@ -80,16 +79,7 @@ async function handleTransactionCreate(
         originalAmount: params.amount.toString(),
         totalInstallments: params.installments,
         type: params.type as "DEPOSIT" | "EXPENSE",
-        category: params.category as
-          | "HOUSING"
-          | "TRANSPORTATION"
-          | "FOOD"
-          | "ENTERTAINMENT"
-          | "HEALTH"
-          | "UTILITY"
-          | "SALARY"
-          | "EDUCATION"
-          | "OTHER",
+        category: params.category as any, // Usar any para permitir todas as novas categorias
         paymentMethod: params.paymentMethod as
           | "CREDIT_CARD"
           | "DEBIT_CARD"
@@ -117,16 +107,7 @@ async function handleTransactionCreate(
         name: installmentName,
         amount: installmentAmount.toString(),
         type: params.type as "DEPOSIT" | "EXPENSE",
-        category: params.category as
-          | "HOUSING"
-          | "TRANSPORTATION"
-          | "FOOD"
-          | "ENTERTAINMENT"
-          | "HEALTH"
-          | "UTILITY"
-          | "SALARY"
-          | "EDUCATION"
-          | "OTHER",
+        category: params.category as any, // Usar any para permitir todas as novas categorias
         paymentMethod: params.paymentMethod as
           | "CREDIT_CARD"
           | "DEBIT_CARD"
@@ -150,16 +131,7 @@ async function handleTransactionCreate(
       name: params.name,
       amount: params.amount.toString(),
       type: params.type as "DEPOSIT" | "EXPENSE",
-      category: params.category as
-        | "HOUSING"
-        | "TRANSPORTATION"
-        | "FOOD"
-        | "ENTERTAINMENT"
-        | "HEALTH"
-        | "UTILITY"
-        | "SALARY"
-        | "EDUCATION"
-        | "OTHER",
+      category: params.category as any, // Usar any para permitir todas as novas categorias
       paymentMethod: params.paymentMethod as
         | "CREDIT_CARD"
         | "DEBIT_CARD"
@@ -216,16 +188,7 @@ async function handleTransactionUpdate(
           name: params.name,
           amount: params.amount.toString(),
           type: params.type as "DEPOSIT" | "EXPENSE",
-          category: params.category as
-            | "HOUSING"
-            | "TRANSPORTATION"
-            | "FOOD"
-            | "ENTERTAINMENT"
-            | "HEALTH"
-            | "UTILITY"
-            | "SALARY"
-            | "EDUCATION"
-            | "OTHER",
+          category: params.category as any, // Usar any para permitir todas as novas categorias
           paymentMethod: params.paymentMethod as
             | "CREDIT_CARD"
             | "DEBIT_CARD"
@@ -267,16 +230,7 @@ async function handleInstallmentUpdate(
       name: params.name,
       amount: params.amount.toString(),
       type: params.type as "DEPOSIT" | "EXPENSE",
-      category: params.category as
-        | "HOUSING"
-        | "TRANSPORTATION"
-        | "FOOD"
-        | "ENTERTAINMENT"
-        | "HEALTH"
-        | "UTILITY"
-        | "SALARY"
-        | "EDUCATION"
-        | "OTHER",
+      category: params.category as any, // Usar any para permitir todas as novas categorias
       paymentMethod: params.paymentMethod as
         | "CREDIT_CARD"
         | "DEBIT_CARD"
@@ -294,7 +248,6 @@ async function handleInstallmentUpdate(
   }
 
   // Se manteve cartão de crédito, atualizar o grupo e todas as parcelas
-  // CORREÇÃO: Usar o valor original do grupo, não o valor da parcela individual
   const totalAmount = params.amount; // Este é o valor total que o usuário quer
   const newInstallmentAmount = totalAmount / installmentGroup.totalInstallments;
 
@@ -305,16 +258,7 @@ async function handleInstallmentUpdate(
       originalName: params.name,
       originalAmount: totalAmount.toString(), // Salvar o valor total
       type: params.type as "DEPOSIT" | "EXPENSE",
-      category: params.category as
-        | "HOUSING"
-        | "TRANSPORTATION"
-        | "FOOD"
-        | "ENTERTAINMENT"
-        | "HEALTH"
-        | "UTILITY"
-        | "SALARY"
-        | "EDUCATION"
-        | "OTHER",
+      category: params.category as any, // Usar any para permitir todas as novas categorias
       updatedAt: new Date(),
     })
     .where(eq(installmentGroupTable.id, installmentGroup.id));
@@ -336,20 +280,10 @@ async function handleInstallmentUpdate(
     await db
       .update(transactionTable)
       .set({
-        // CORREÇÃO: Usar o nome original, não adicionar sufixo sobre sufixo
         name: `${params.name} (${installment.installmentNumber}/${installmentGroup.totalInstallments})`,
         amount: newInstallmentAmount.toString(),
         type: params.type as "DEPOSIT" | "EXPENSE",
-        category: params.category as
-          | "HOUSING"
-          | "TRANSPORTATION"
-          | "FOOD"
-          | "ENTERTAINMENT"
-          | "HEALTH"
-          | "UTILITY"
-          | "SALARY"
-          | "EDUCATION"
-          | "OTHER",
+        category: params.category as any, // Usar any para permitir todas as novas categorias
         date: installmentDate,
         updatedAt: new Date(),
       })

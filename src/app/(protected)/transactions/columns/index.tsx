@@ -11,8 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DEPOSIT_CATEGORY_OPTIONS,
+  EXPENSE_CATEGORY_OPTIONS,
   TRANSACTION_CATEGORY_LABELS,
-  TRANSACTION_CATEGORY_OPTIONS,
   TRANSACTION_PAYMENT_METHOD_LABELS,
   TRANSACTION_PAYMENT_METHOD_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
@@ -89,8 +90,20 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas</SelectItem>
-            {TRANSACTION_CATEGORY_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+            {/* Mostrar todas as categorias (tanto de despesa quanto receita) */}
+            <SelectItem value="--- DESPESAS ---" disabled>
+              --- DESPESAS ---
+            </SelectItem>
+            {EXPENSE_CATEGORY_OPTIONS.map((option) => (
+              <SelectItem key={`expense-${option.value}`} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+            <SelectItem value="--- RECEITAS ---" disabled>
+              --- RECEITAS ---
+            </SelectItem>
+            {DEPOSIT_CATEGORY_OPTIONS.map((option) => (
+              <SelectItem key={`deposit-${option.value}`} value={option.value}>
                 {option.label}
               </SelectItem>
             ))}
@@ -102,7 +115,12 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
       return TRANSACTION_CATEGORY_LABELS[transaction.category];
     },
     filterFn: (row, columnId, filterValue) => {
-      if (filterValue === "all" || !filterValue) return true;
+      if (
+        filterValue === "all" ||
+        !filterValue ||
+        filterValue.startsWith("---")
+      )
+        return true;
       return row.getValue(columnId) === filterValue;
     },
   },
