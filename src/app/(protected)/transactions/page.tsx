@@ -7,6 +7,7 @@ import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
 import NavBar from "@/components/navbar";
 import { DataTable } from "@/components/ui/data-table";
+import { getUsageAndTransactionCount } from "@/data/get-ai-usage/get-ai-usage";
 import { getTransactions } from "@/data/get-transactions-data/get-transactions-data";
 import { auth } from "@/lib/auth";
 
@@ -56,6 +57,8 @@ const TransactionsPage = async ({ searchParams }: TransactionsPageProps) => {
     redirect("/authentication");
   }
 
+  const { hasTransactions, usage } = await getUsageAndTransactionCount();
+
   const page = Number(pageParam ?? "1");
 
   // Para o botão de Gerar Relatório, usamos o mês e ano atuais
@@ -70,8 +73,13 @@ const TransactionsPage = async ({ searchParams }: TransactionsPageProps) => {
         <div className="flex w-full items-center justify-between text-2xl">
           <h1 className="text-2xl font-bold">Transações</h1>
           <div className="flex items-center gap-4">
-            <AITransactionButton />
-            <GenerateReportButton month={currentMonth} year={currentYear} />
+            <AITransactionButton hasQuota={usage.transactions.hasQuota} />
+            <GenerateReportButton
+              month={currentMonth}
+              year={currentYear}
+              hasTransactions={hasTransactions}
+              hasQuota={usage.reports.hasQuota}
+            />
             <AddTransactionButton />
           </div>
         </div>
