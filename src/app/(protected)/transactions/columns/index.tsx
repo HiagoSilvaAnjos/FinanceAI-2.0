@@ -20,9 +20,9 @@ import {
 } from "@/constants/transactions";
 import { Transaction } from "@/types/transaction";
 
-import DeleteTransactionButton from "../components/delete-transaction-button";
-import EditTransactionButton from "../components/edit-transaction-button";
-import TransactioTypeBadge from "../components/type-badge";
+import DeleteTransactionButton from "../_components/delete-transaction-button";
+import EditTransactionButton from "../_components/edit-transaction-button";
+import TransactioTypeBadge from "../_components/type-badge";
 
 export const transactionColumns: ColumnDef<Transaction>[] = [
   {

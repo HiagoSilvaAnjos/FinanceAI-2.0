@@ -1,17 +1,53 @@
-import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import AddTransactionButton from "@/components/add-transaction-button";
+import AITransactionButton from "@/components/ai-transaction-button";
+import GenerateReportButton from "@/components/generate-report-button";
 import NavBar from "@/components/navbar";
 import { DataTable } from "@/components/ui/data-table";
-import { db } from "@/db";
-import { transactionTable } from "@/db/schema";
+import { getTransactions } from "@/data/get-transactions-data/get-transactions-data";
 import { auth } from "@/lib/auth";
 
+import { TransactionsTableSkeleton } from "./_components/data-table-skeleton";
+import { PaginationControls } from "./_components/transaction-pagination";
 import { transactionColumns } from "./columns";
 
-const TransactionsPage = async () => {
+const TRANSACTIONS_PER_PAGE = 10;
+
+// Componente para buscar os dados da tabela
+async function TransactionsTable({ page }: { page: number }) {
+  const { transactions, totalCount } = await getTransactions({
+    page,
+    limit: TRANSACTIONS_PER_PAGE,
+  });
+
+  const hasNextPage = page * TRANSACTIONS_PER_PAGE < totalCount;
+  const hasPrevPage = page > 1;
+
+  return (
+    <DataTable columns={transactionColumns} data={transactions}>
+      <PaginationControls
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        totalCount={totalCount}
+        perPage={TRANSACTIONS_PER_PAGE}
+      />
+    </DataTable>
+  );
+}
+
+// Componente principal da página
+interface TransactionsPageProps {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+}
+
+const TransactionsPage = async ({ searchParams }: TransactionsPageProps) => {
+  const { page: pageParam } = await searchParams;
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -20,14 +56,12 @@ const TransactionsPage = async () => {
     redirect("/authentication");
   }
 
-  const transactions = await db.query.transactionTable.findMany({
-    where: eq(transactionTable.userId, session.user.id),
-    with: {
-      installmentGroup: true,
-    },
-  });
+  const page = Number(pageParam ?? "1");
 
-  console.log(transactions);
+  // Para o botão de Gerar Relatório, usamos o mês e ano atuais
+  const currentDate = new Date();
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const currentYear = String(currentDate.getFullYear());
 
   return (
     <>
@@ -35,10 +69,16 @@ const TransactionsPage = async () => {
       <div className="space-y-6 p-6">
         <div className="flex w-full items-center justify-between text-2xl">
           <h1 className="text-2xl font-bold">Transações</h1>
-          <AddTransactionButton />
+          <div className="flex items-center gap-4">
+            <AITransactionButton />
+            <GenerateReportButton month={currentMonth} year={currentYear} />
+            <AddTransactionButton />
+          </div>
         </div>
         <div className="mt-4">
-          <DataTable columns={transactionColumns} data={transactions} />
+          <Suspense fallback={<TransactionsTableSkeleton />}>
+            <TransactionsTable page={page} />
+          </Suspense>
         </div>
       </div>
     </>

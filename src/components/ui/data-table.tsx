@@ -7,11 +7,13 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import React from "react";
 
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,11 +22,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  children?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  children,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -76,6 +80,13 @@ export function DataTable<TData, TValue>({
             </TableRow>
           )}
         </TableBody>
+        {children && (
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={columns.length}>{children}</TableCell>
+            </TableRow>
+          </TableFooter>
+        )}
       </Table>
     </div>
   );
