@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
@@ -19,7 +20,7 @@ export const deleteTransaction = async (params: DelteTransactionSchema) => {
   });
 
   if (!session?.user) {
-    throw new Error("Unauthorized");
+    redirect("/authentication");
   }
 
   // Buscar a transação a ser deletada

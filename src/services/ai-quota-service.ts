@@ -1,5 +1,6 @@
 import { and, eq, gte, sql } from "drizzle-orm";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { db } from "@/db";
 import { aiUsageTable } from "@/db/schema";
@@ -40,7 +41,7 @@ export async function checkAIQuota(
   });
 
   if (!session?.user) {
-    throw new Error("Unauthorized");
+    redirect("/authentication");
   }
 
   const userId = session.user.id;

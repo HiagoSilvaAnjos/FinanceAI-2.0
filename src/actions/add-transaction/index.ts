@@ -4,6 +4,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
@@ -28,7 +29,7 @@ export const upsertTransaction = async (params: UpsertTransactionParams) => {
   });
 
   if (!session?.user) {
-    throw new Error("Unauthorized");
+    redirect("/authentication");
   }
 
   const userId = session.user.id;
