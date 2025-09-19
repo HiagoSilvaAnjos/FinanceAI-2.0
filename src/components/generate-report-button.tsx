@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -28,14 +27,29 @@ import {
 interface GenerateReportButtonProps {
   month: string;
   year: string;
+  hasTransactions: boolean;
+  hasQuota: boolean;
 }
 
-const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
+const GenerateReportButton = ({
+  month,
+  year,
+  hasTransactions,
+  hasQuota,
+}: GenerateReportButtonProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showQuotaDialog, setShowQuotaDialog] = useState(false);
   const [quotaInfo, setQuotaInfo] = useState<any>(null);
 
   const handleGenerateReport = async () => {
+    if (!hasTransactions) {
+      toast.error("Nenhuma transação encontrada", {
+        description:
+          "Adicione pelo menos uma transação para gerar um relatório.",
+      });
+      return;
+    }
+
     setIsGenerating(true);
 
     try {
@@ -46,16 +60,13 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
       const reportData = await generateReport(month, year);
 
       if (reportData.quotaExceeded) {
-        // Mostrar modal de quota excedida
         setQuotaInfo(reportData.quotaInfo);
         setShowQuotaDialog(true);
         toast.error("Limite mensal de relatórios atingido", {
           description: `Você pode gerar novamente em ${reportData.quotaInfo?.timeUntilReset}`,
         });
       } else if (reportData.success) {
-        // Gerar PDF
         await generatePDF(reportData);
-
         toast.success("Relatório gerado com sucesso!", {
           description: "O download foi iniciado automaticamente",
         });
@@ -91,25 +102,21 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
     const secondaryColor = [24, 25, 29];
     const darkText = [0, 0, 0];
     const lightText = [255, 255, 255];
-    const lightGray = [150, 150, 150];
 
     // Header do PDF
     pdf.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
     pdf.rect(0, 0, pageWidth, 40, "F");
 
-    // Adiciona a imagem PNG diretamente
     const logoImg = "/logo.png";
     const img = new Image();
     img.src = logoImg;
 
-    // Para evitar que a imagem estique, calculamos a altura proporcional
     const logoWidth = 40;
-    const aspectRatio = 39 / 173; // Proporção original do logo
+    const aspectRatio = 39 / 173;
     const logoHeight = logoWidth * aspectRatio;
 
     pdf.addImage(img, "PNG", margin, 12, logoWidth, logoHeight);
 
-    // Título e subtítulo
     pdf.setTextColor(lightText[0], lightText[1], lightText[2]);
     pdf.setFontSize(18);
     pdf.setFont("helvetica", "bold");
@@ -118,7 +125,6 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
     pdf.setFont("helvetica", "normal");
     pdf.text("Análise detalhada por Inteligência Artificial", margin + 50, 28);
 
-    // Informações do usuário
     let yPosition = 60;
     pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.setFontSize(16);
@@ -128,12 +134,11 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
     yPosition += 10;
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(darkText[0], darkText[1], darkText[2]); // Texto em cor escura
+    pdf.setTextColor(darkText[0], darkText[1], darkText[2]);
     pdf.text(`Usuário: ${data.userData.name}`, margin, yPosition);
     pdf.text(`E-mail: ${data.userData.email}`, margin + 80, yPosition);
     pdf.text(`Período: ${data.userData.period}`, margin + 140, yPosition);
 
-    // Resumo Financeiro
     yPosition += 15;
     pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.setFontSize(14);
@@ -165,21 +170,22 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
     ];
 
     let currentY = yPosition;
-    summaryData.forEach((item, index) => {
+    summaryData.forEach((item) => {
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(darkText[0], darkText[1], darkText[2]);
       pdf.text(`${item.label}:`, margin, currentY);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(item.color[0], item.color[1], item.color[2]);
       pdf.text(
-        `R$ ${item.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+        `R$ ${item.value.toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+        })}`,
         margin + 25,
         currentY,
       );
       currentY += 6;
     });
 
-    // Conteúdo da IA
     yPosition = currentY + 10;
     pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     pdf.setFontSize(14);
@@ -259,7 +265,6 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
       yPosition += 2;
     }
 
-    // Footer
     const totalPages = pdf.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
@@ -267,7 +272,10 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(darkText[0], darkText[1], darkText[2]);
       pdf.text(
-        `Página ${i} de ${totalPages} - Gerado por FinanceAI em ${format(new Date(), "dd/MM/yyyy")}`,
+        `Página ${i} de ${totalPages} - Gerado por FinanceAI em ${format(
+          new Date(),
+          "dd/MM/yyyy",
+        )}`,
         margin,
         pageHeight - 10,
       );
@@ -278,17 +286,22 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
       );
     }
 
-    // Salvar PDF
-    const fileName = `relatorio-financeAI-${data.userData.period.replace("/", "-")}.pdf`;
+    const fileName = `relatorio-financeAI-${data.userData.period.replace(
+      "/",
+      "-",
+    )}.pdf`;
     pdf.save(fileName);
   };
+
+  const buttonClass = hasQuota
+    ? "bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
+    : "bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800";
 
   return (
     <>
       <Button
         onClick={handleGenerateReport}
-        disabled={isGenerating}
-        className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
+        className={`flex items-center gap-2 ${buttonClass}`}
         variant="outline"
       >
         {isGenerating ? (
@@ -300,7 +313,6 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
         <Sparkles className="h-4 w-4" />
       </Button>
 
-      {/* Dialog para quota excedida */}
       <Dialog open={showQuotaDialog} onOpenChange={setShowQuotaDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>

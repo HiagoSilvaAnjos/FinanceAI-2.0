@@ -1,5 +1,3 @@
-// src/app/(protected)/(dashboard)/page.tsx
-
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -8,16 +6,19 @@ import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
 import MonthlyHistoryChart from "@/components/monthly-history-chart";
 import NavBar from "@/components/navbar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUsageAndTransactionCount } from "@/data/get-ai-usage/get-ai-usage";
 import { getDashboard } from "@/data/get-dashboard";
 import { getHistoricalData } from "@/data/get-historical-data";
 import { auth } from "@/lib/auth";
 
+import AIUsageButton from "./_components/ai-usage-button";
 import {
+  DashboardHeaderSkeleton,
   ExpensesPerCategorySkeleton,
   LastTransactionsSkeleton,
   MonthlyHistoryChartSkeleton,
   SummaryCardsSkeleton,
-  TimeSelectSkeleton,
   TransactionsPieChartSkeleton,
 } from "./_components/dashboard-skeleton";
 import ExpensesPerCategory from "./_components/expenses-per-category";
@@ -26,7 +27,34 @@ import SummaryCards from "./_components/summary-cards";
 import TimeSelect from "./_components/time-select";
 import TransactionsPieChart from "./_components/transactions-pie-chart";
 
-// --- Componentes Assíncronos Individuais ---
+async function DashboardHeader({
+  month,
+  year,
+}: {
+  month: string;
+  year: string;
+}) {
+  const { hasTransactions, usage } = await getUsageAndTransactionCount();
+
+  return (
+    <div className="flex justify-between">
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div className="flex items-center gap-4">
+        <Suspense fallback={<Skeleton className="h-9 w-28 rounded-full" />}>
+          <AIUsageButton />
+        </Suspense>
+        <AITransactionButton hasQuota={usage.transactions.hasQuota} />
+        <GenerateReportButton
+          month={month}
+          year={year}
+          hasTransactions={hasTransactions}
+          hasQuota={usage.reports.hasQuota}
+        />
+        <TimeSelect selectedMonth={month} selectedYear={year} />
+      </div>
+    </div>
+  );
+}
 
 async function SummaryCardsData({
   month,
@@ -96,19 +124,9 @@ export default async function Home({ searchParams }: HomeProps) {
     <div>
       <NavBar />
       <div className="space-y-6 p-6">
-        <div className="flex justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <AITransactionButton />
-            <GenerateReportButton month={selectedMonth} year={selectedYear} />
-            <Suspense fallback={<TimeSelectSkeleton />}>
-              <TimeSelect
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-              />
-            </Suspense>
-          </div>
-        </div>
+        <Suspense fallback={<DashboardHeaderSkeleton />}>
+          <DashboardHeader month={selectedMonth} year={selectedYear} />
+        </Suspense>
 
         <div className="grid grid-cols-[2fr,1fr] gap-6">
           <div className="flex flex-col gap-6">

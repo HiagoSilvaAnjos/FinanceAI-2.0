@@ -34,11 +34,19 @@ export function MonthlyHistoryChartSkeleton() {
   return <Skeleton className="h-[422px] w-full rounded-xl bg-white/10" />;
 }
 
-export function TimeSelectSkeleton() {
+export function DashboardHeaderSkeleton() {
   return (
-    <div className="flex gap-4">
-      <Skeleton className="h-9 w-[150px] rounded-full bg-white/10" />
-      <Skeleton className="h-9 w-[100px] rounded-full bg-white/10" />
+    <div className="flex justify-between">
+      <Skeleton className="h-8 w-48 bg-white/10" />
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-9 w-28 rounded-full bg-white/10" />
+        <Skeleton className="h-9 w-52 rounded-full bg-white/10" />
+        <Skeleton className="h-9 w-60 rounded-full bg-white/10" />
+        <div className="flex gap-4">
+          <Skeleton className="h-9 w-[150px] rounded-full bg-white/10" />
+          <Skeleton className="h-9 w-[100px] rounded-full bg-white/10" />
+        </div>
+      </div>
     </div>
   );
 }
