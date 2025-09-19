@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import GenerateReportButton from "@/components/generate-report-button";
 // import ComparisonChart from "@/components/comparison-chart";
 import MonthlyHistoryChart from "@/components/monthly-history-chart";
 import NavBar from "@/components/navbar";
@@ -54,10 +55,14 @@ export default async function Home({ searchParams }: HomeProps) {
       <div className="space-y-6 p-6">
         <div className="flex justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <TimeSelect
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-          />
+          <div className="flex items-center gap-4">
+            <GenerateReportButton month={selectedMonth} year={selectedYear} />
+
+            <TimeSelect
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
+            />
+          </div>
         </div>
 
         {/* Seção principal com resumo e transações */}
