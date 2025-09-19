@@ -6,16 +6,62 @@ import { TRANSACTION_CATEGORY_LABELS } from "@/constants/transactions";
 import { getDashboard } from "@/data/get-dashboard";
 import { getHistoricalData } from "@/data/get-historical-data";
 import { auth } from "@/lib/auth";
+import { checkAIQuota, incrementAIUsage } from "@/services/ai-quota-service";
 import { generateFinancialReport } from "@/services/groq-service";
 
-export async function generateReport(month: string, year: string) {
+interface ReportResult {
+  success: boolean;
+  content?: string;
+  userData?: {
+    name: string;
+    email: string;
+    generatedAt: Date;
+    period: string;
+  };
+  financialSummary?: {
+    balance: number;
+    deposits: number;
+    expenses: number;
+  };
+  error?: string;
+  quotaExceeded?: boolean;
+  quotaInfo?: {
+    currentUsage: number;
+    limit: number;
+    timeUntilReset: string;
+  };
+}
+
+export async function generateReport(
+  month: string,
+  year: string,
+): Promise<ReportResult> {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
 
     if (!session?.user) {
-      throw new Error("Unauthorized");
+      return {
+        success: false,
+        error: "Usuário não autenticado.",
+      };
+    }
+
+    // Verificar quota ANTES de processar
+    const quotaCheck = await checkAIQuota("AI_REPORT");
+
+    if (!quotaCheck.hasQuota) {
+      return {
+        success: false,
+        error: "Limite mensal de relatórios com IA atingido.",
+        quotaExceeded: true,
+        quotaInfo: {
+          currentUsage: quotaCheck.currentUsage,
+          limit: quotaCheck.limit,
+          timeUntilReset: quotaCheck.timeUntilReset,
+        },
+      };
     }
 
     // Buscar dados do dashboard
@@ -49,11 +95,22 @@ export async function generateReport(month: string, year: string) {
       historicalData,
     };
 
+    // Incrementar quota ANTES de gerar
+    await incrementAIUsage("AI_REPORT", 1);
+
     // Gerar relatório com IA
     const reportContent = await generateFinancialReport(aiData);
 
+    if (!reportContent || reportContent.includes("Erro ao gerar relatório")) {
+      return {
+        success: false,
+        error: "Falha ao gerar relatório com IA. Tente novamente.",
+      };
+    }
+
     // Retornar dados para o PDF
     return {
+      success: true,
       content: reportContent,
       userData: {
         name: session.user.name || "Usuário",
@@ -69,6 +126,9 @@ export async function generateReport(month: string, year: string) {
     };
   } catch (error) {
     console.error("Erro ao gerar relatório:", error);
-    throw new Error("Falha ao gerar relatório");
+    return {
+      success: false,
+      error: "Erro interno do servidor. Tente novamente.",
+    };
   }
 }

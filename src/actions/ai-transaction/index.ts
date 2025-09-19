@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 
 import { upsertTransaction } from "@/actions/add-transaction";
 import { auth } from "@/lib/auth";
+import { checkAIQuota, incrementAIUsage } from "@/services/ai-quota-service";
 import { parseTransactionWithAI } from "@/services/ai-transaction-service";
 
 interface AITransactionResult {
@@ -19,6 +20,12 @@ interface AITransactionResult {
     type: string;
     installments?: number;
   }>;
+  quotaExceeded?: boolean;
+  quotaInfo?: {
+    currentUsage: number;
+    limit: number;
+    timeUntilReset: string;
+  };
 }
 
 export async function createTransactionWithAI(
@@ -39,6 +46,24 @@ export async function createTransactionWithAI(
       };
     }
 
+    // Verificar quota ANTES de processar
+    const quotaCheck = await checkAIQuota("AI_TRANSACTION");
+
+    if (!quotaCheck.hasQuota) {
+      return {
+        success: false,
+        createdTransactions: 0,
+        totalAmount: 0,
+        error: "Limite diário de transações com IA atingido.",
+        quotaExceeded: true,
+        quotaInfo: {
+          currentUsage: quotaCheck.currentUsage,
+          limit: quotaCheck.limit,
+          timeUntilReset: quotaCheck.timeUntilReset,
+        },
+      };
+    }
+
     // Validação básica do input
     if (!userInput || userInput.trim().length < 3) {
       return {
@@ -53,6 +78,9 @@ export async function createTransactionWithAI(
     const aiResult = await parseTransactionWithAI(userInput);
 
     if (!aiResult.success || aiResult.transactions.length === 0) {
+      // Mesmo com falha, incrementar quota para evitar spam
+      await incrementAIUsage("AI_TRANSACTION", 1);
+
       return {
         success: false,
         createdTransactions: 0,
@@ -61,6 +89,9 @@ export async function createTransactionWithAI(
         confidence: aiResult.confidence,
       };
     }
+
+    // Incrementar quota APÓS sucesso da IA
+    await incrementAIUsage("AI_TRANSACTION", 1);
 
     // Criar transações no banco
     let createdCount = 0;

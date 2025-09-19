@@ -1,12 +1,15 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  date,
   decimal,
+  index,
   integer,
   pgEnum,
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -145,11 +148,6 @@ export const transactionTable = pgTable("transaction", {
   installmentNumber: integer("installment_number"),
 });
 
-export const usersRelations = relations(userTable, ({ many }) => ({
-  transactions: many(transactionTable),
-  installmentGroups: many(installmentGroupTable),
-}));
-
 export const installmentGroupRelations = relations(
   installmentGroupTable,
   ({ one, many }) => ({
@@ -170,4 +168,48 @@ export const transactionsRelations = relations(transactionTable, ({ one }) => ({
     fields: [transactionTable.installmentGroupId],
     references: [installmentGroupTable.id],
   }),
+}));
+
+export const aiUsageTable = pgTable(
+  "ai_usage",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, { onDelete: "cascade" }),
+    featureType: text("feature_type", {
+      enum: ["AI_TRANSACTION", "AI_REPORT"],
+    }).notNull(),
+    usageDate: date("usage_date").defaultNow().notNull(),
+    usageCount: integer("usage_count").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    uniqueUserFeatureDate: unique().on(
+      table.userId,
+      table.featureType,
+      table.usageDate,
+    ),
+    userFeatureIdx: index().on(table.userId, table.featureType),
+    dateIdx: index().on(table.usageDate),
+  }),
+);
+
+// Relações
+export const aiUsageRelations = relations(aiUsageTable, ({ one }) => ({
+  user: one(userTable, {
+    fields: [aiUsageTable.userId],
+    references: [userTable.id],
+  }),
+}));
+
+// Adicionar às relações do usuário
+export const usersRelations = relations(userTable, ({ many }) => ({
+  transactions: many(transactionTable),
+  installmentGroups: many(installmentGroupTable),
+  aiUsage: many(aiUsageTable),
 }));

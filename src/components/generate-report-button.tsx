@@ -4,12 +4,26 @@
 
 import { format } from "date-fns";
 import jsPDF from "jspdf";
-import { FileText, Loader2, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock,
+  FileText,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { generateReport } from "@/actions/generate-report";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface GenerateReportButtonProps {
   month: string;
@@ -18,6 +32,8 @@ interface GenerateReportButtonProps {
 
 const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showQuotaDialog, setShowQuotaDialog] = useState(false);
+  const [quotaInfo, setQuotaInfo] = useState<any>(null);
 
   const handleGenerateReport = async () => {
     setIsGenerating(true);
@@ -29,12 +45,25 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
 
       const reportData = await generateReport(month, year);
 
-      // Gerar PDF
-      await generatePDF(reportData);
+      if (reportData.quotaExceeded) {
+        // Mostrar modal de quota excedida
+        setQuotaInfo(reportData.quotaInfo);
+        setShowQuotaDialog(true);
+        toast.error("Limite mensal de relatórios atingido", {
+          description: `Você pode gerar novamente em ${reportData.quotaInfo?.timeUntilReset}`,
+        });
+      } else if (reportData.success) {
+        // Gerar PDF
+        await generatePDF(reportData);
 
-      toast.success("Relatório gerado com sucesso!", {
-        description: "O download foi iniciado automaticamente",
-      });
+        toast.success("Relatório gerado com sucesso!", {
+          description: "O download foi iniciado automaticamente",
+        });
+      } else {
+        toast.error("Erro ao gerar relatório", {
+          description: reportData.error || "Tente novamente em alguns momentos",
+        });
+      }
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
       toast.error("Erro ao gerar relatório", {
@@ -255,20 +284,64 @@ const GenerateReportButton = ({ month, year }: GenerateReportButtonProps) => {
   };
 
   return (
-    <Button
-      onClick={handleGenerateReport}
-      disabled={isGenerating}
-      className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
-      variant="outline"
-    >
-      {isGenerating ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : (
-        <FileText className="h-4 w-4" />
-      )}
-      {isGenerating ? "Gerando..." : "Gerar Relatório com IA"}
-      <Sparkles className="h-4 w-4" />
-    </Button>
+    <>
+      <Button
+        onClick={handleGenerateReport}
+        disabled={isGenerating}
+        className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
+        variant="outline"
+      >
+        {isGenerating ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <FileText className="h-4 w-4" />
+        )}
+        {isGenerating ? "Gerando..." : "Gerar Relatório com IA"}
+        <Sparkles className="h-4 w-4" />
+      </Button>
+
+      {/* Dialog para quota excedida */}
+      <Dialog open={showQuotaDialog} onOpenChange={setShowQuotaDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
+              Limite Mensal Atingido
+            </DialogTitle>
+            <DialogDescription>
+              Você já utilizou todos os relatórios com IA deste mês.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="flex flex-col items-center space-y-3 text-center">
+              <div className="w-full rounded-lg bg-muted p-4">
+                <div className="flex items-center justify-center gap-2 text-sm">
+                  <Clock className="h-4 w-4" />
+                  <span>
+                    Resetará em: <strong>{quotaInfo?.timeUntilReset}</strong>
+                  </span>
+                </div>
+                <div className="mt-1 text-center text-xs text-muted-foreground">
+                  Uso atual: {quotaInfo?.currentUsage}/{quotaInfo?.limit}{" "}
+                  relatórios
+                </div>
+              </div>
+
+              <div className="text-sm dark:text-white">
+                Os limites são renovados todo primeiro dia do mês
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <DialogClose asChild>
+              <Button variant="outline">Entendi</Button>
+            </DialogClose>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
