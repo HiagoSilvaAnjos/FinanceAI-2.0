@@ -172,6 +172,8 @@ const UpsertTransactionDialog = ({
   // Obter categorias baseadas no tipo selecionado
   const availableCategories = getCategoriesByType(transactionType);
 
+  // Modifique o DialogContent no arquivo src/components/upsert-transaction-dialog.tsx
+
   return (
     <Dialog
       open={isOpen}
@@ -182,273 +184,292 @@ const UpsertTransactionDialog = ({
         }
       }}
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {isUpdate ? "Editar" : "Adicionar"} Transação
-          </DialogTitle>
-          <DialogDescription>Insira as informações abaixo</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-h-[90vh] max-w-2xl p-0 sm:max-h-[85vh]">
+        {/* Header fixo */}
+        <div className="flex-shrink-0 p-6 pb-0">
+          <DialogHeader>
+            <DialogTitle>
+              {isUpdate ? "Editar" : "Adicionar"} Transação
+            </DialogTitle>
+            <DialogDescription>Insira as informações abaixo</DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome da sua transação</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="ex: Compra de supermercado"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {isCreditCard
-                      ? "Valor total somando suas parcelas"
-                      : "Valor da transação"}
-                    {isCreditCard &&
-                      form.watch("installments") &&
-                      form.watch("installments")! > 1 && (
-                        <span className="ml-2 text-sm text-muted-foreground">
-                          (Valor total - será dividido em{" "}
-                          {form.watch("installments")} parcelas)
-                        </span>
-                      )}
-                  </FormLabel>
-
-                  <FormControl>
-                    <MoneyInput
-                      placeholder="Digite o valor..."
-                      value={field.value || 0}
-                      onValueChange={({ floatValue }) => {
-                        field.onChange(floatValue || undefined);
-                      }}
-                      onBlur={field.onBlur}
-                      disabled={field.disabled}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo da transação</FormLabel>
-
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {TRANSACTION_TYPE_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Categoria da transação
-                    <span className="ml-2 text-sm text-muted-foreground">
-                      ({transactionType === "EXPENSE" ? "Despesa" : "Receita"})
-                    </span>
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione uma categoria..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {availableCategories.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="paymentMethod"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Forma de pagamento
-                    {isInstallmentTransaction && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        (Transação parcelada - não editável)
-                      </span>
-                    )}
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={isInstallmentTransaction}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um método de pagamento..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {TRANSACTION_PAYMENT_METHOD_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Campo de parcelas - só aparece para cartão de crédito E não for transação parcelada existente */}
-            {isCreditCard && !isInstallmentTransaction && (
+        {/* Container com scroll para o formulário */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <Form {...form}>
+            <div className="space-y-6">
               <FormField
                 control={form.control}
-                name="installments"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Número de parcelas</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(Number(value))}
-                      value={field.value?.toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o número de parcelas..." />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Array.from({ length: 24 }, (_, i) => i + 1).map(
-                          (num) => (
-                            <SelectItem key={num} value={num.toString()}>
-                              {num}x
-                            </SelectItem>
-                          ),
-                        )}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Nome da sua transação</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="ex: Compra de supermercado"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
-                    {field.value &&
-                      field.value > 1 &&
-                      form.watch("amount") > 0 && (
-                        <p className="text-sm text-muted-foreground">
-                          Cada parcela:{" "}
-                          {new Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(form.watch("amount") / field.value)}
-                        </p>
-                      )}
                   </FormItem>
                 )}
               />
-            )}
 
-            {/* Mostrar informações da parcela se for transação parcelada */}
-            {isInstallmentTransaction && defaultValues?.installmentGroup && (
-              <div className="rounded-lg border bg-muted p-4">
-                <h4 className="mb-2 font-semibold">Informações da Parcela</h4>
-                <div className="space-y-1 text-sm">
-                  <p>
-                    <span className="font-medium">Parcela:</span>{" "}
-                    {defaultValues.installmentNumber} de{" "}
-                    {defaultValues.installmentGroup.totalInstallments}
-                  </p>
-                  <p>
-                    <span className="font-medium">Valor por parcela:</span>{" "}
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(
-                      Number(defaultValues.installmentGroup.originalAmount) /
-                        defaultValues.installmentGroup.totalInstallments,
-                    )}
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    Alterações afetarão todas as parcelas desta compra
-                  </p>
-                </div>
-              </div>
-            )}
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {isCreditCard
+                        ? "Valor total somando suas parcelas"
+                        : "Valor da transação"}
+                      {isCreditCard &&
+                        form.watch("installments") &&
+                        form.watch("installments")! > 1 && (
+                          <span className="ml-2 text-sm text-muted-foreground">
+                            (Valor total - será dividido em{" "}
+                            {form.watch("installments")} parcelas)
+                          </span>
+                        )}
+                    </FormLabel>
 
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Data
-                    {isCreditCard &&
-                      form.watch("installments") &&
-                      form.watch("installments")! > 1 && (
+                    <FormControl>
+                      <MoneyInput
+                        placeholder="Digite o valor..."
+                        value={field.value || 0}
+                        onValueChange={({ floatValue }) => {
+                          field.onChange(floatValue || undefined);
+                        }}
+                        onBlur={field.onBlur}
+                        disabled={field.disabled}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo da transação</FormLabel>
+
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {TRANSACTION_TYPE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Categoria da transação
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        ({transactionType === "EXPENSE" ? "Despesa" : "Receita"}
+                        )
+                      </span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma categoria..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableCategories.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Forma de pagamento
+                      {isInstallmentTransaction && (
                         <span className="ml-2 text-sm text-muted-foreground">
-                          (Data da primeira parcela)
+                          (Transação parcelada - não editável)
                         </span>
                       )}
-                  </FormLabel>
-                  <DatePicker value={field.value} onChange={field.onChange} />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant={"outline"}>
-                  Cancelar
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? (
-                  <>
-                    <LoaderCircleIcon className="animate-spin" />
-                    &nbsp;Salvando...
-                  </>
-                ) : isUpdate ? (
-                  "Editar"
-                ) : (
-                  "Adicionar"
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={isInstallmentTransaction}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um método de pagamento..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {TRANSACTION_PAYMENT_METHOD_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
+              />
+
+              {/* Campo de parcelas - só aparece para cartão de crédito E não for transação parcelada existente */}
+              {isCreditCard && !isInstallmentTransaction && (
+                <FormField
+                  control={form.control}
+                  name="installments"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de parcelas</FormLabel>
+                      <Select
+                        onValueChange={(value) => field.onChange(Number(value))}
+                        value={field.value?.toString()}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o número de parcelas..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Array.from({ length: 24 }, (_, i) => i + 1).map(
+                            (num) => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num}x
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      {field.value &&
+                        field.value > 1 &&
+                        form.watch("amount") > 0 && (
+                          <div className="mt-2 rounded-md bg-muted/50 p-2">
+                            <p className="text-sm text-muted-foreground">
+                              <span className="font-medium">Cada parcela:</span>{" "}
+                              {new Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                              }).format(form.watch("amount") / field.value)}
+                            </p>
+                          </div>
+                        )}
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* Mostrar informações da parcela se for transação parcelada */}
+              {isInstallmentTransaction && defaultValues?.installmentGroup && (
+                <div className="rounded-lg border bg-muted p-4">
+                  <h4 className="mb-2 font-semibold">Informações da Parcela</h4>
+                  <div className="space-y-1 text-sm">
+                    <p>
+                      <span className="font-medium">Parcela:</span>{" "}
+                      {defaultValues.installmentNumber} de{" "}
+                      {defaultValues.installmentGroup.totalInstallments}
+                    </p>
+                    <p>
+                      <span className="font-medium">Valor por parcela:</span>{" "}
+                      {new Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(
+                        Number(defaultValues.installmentGroup.originalAmount) /
+                          defaultValues.installmentGroup.totalInstallments,
+                      )}
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Alterações afetarão todas as parcelas desta compra
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Data
+                      {isCreditCard &&
+                        form.watch("installments") &&
+                        form.watch("installments")! > 1 && (
+                          <span className="ml-2 text-sm text-muted-foreground">
+                            (Data da primeira parcela)
+                          </span>
+                        )}
+                    </FormLabel>
+                    <DatePicker value={field.value} onChange={field.onChange} />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Espaço extra no final para garantir que o último campo seja visível */}
+              <div className="h-4" />
+            </div>
+          </Form>
+        </div>
+
+        {/* Footer fixo */}
+        <div className="flex-shrink-0 border-t bg-background p-6 pt-4">
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant={"outline"}>
+                Cancelar
               </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </DialogClose>
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              onClick={form.handleSubmit(onSubmit)}
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <LoaderCircleIcon className="animate-spin" />
+                  &nbsp;Salvando...
+                </>
+              ) : isUpdate ? (
+                "Editar"
+              ) : (
+                "Adicionar"
+              )}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
