@@ -1,23 +1,75 @@
+// src/app/(protected)/(dashboard)/page.tsx
+
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
-// import ComparisonChart from "@/components/comparison-chart";
 import MonthlyHistoryChart from "@/components/monthly-history-chart";
 import NavBar from "@/components/navbar";
 import { getDashboard } from "@/data/get-dashboard";
-import {
-  // getComparisonData,
-  getHistoricalData,
-} from "@/data/get-historical-data";
+import { getHistoricalData } from "@/data/get-historical-data";
 import { auth } from "@/lib/auth";
 
+import {
+  ExpensesPerCategorySkeleton,
+  LastTransactionsSkeleton,
+  MonthlyHistoryChartSkeleton,
+  SummaryCardsSkeleton,
+  TimeSelectSkeleton,
+  TransactionsPieChartSkeleton,
+} from "./_components/dashboard-skeleton";
 import ExpensesPerCategory from "./_components/expenses-per-category";
 import LastTransactions from "./_components/last-transactions";
 import SummaryCards from "./_components/summary-cards";
 import TimeSelect from "./_components/time-select";
 import TransactionsPieChart from "./_components/transactions-pie-chart";
+
+// --- Componentes Assíncronos Individuais ---
+
+async function SummaryCardsData({
+  month,
+  year,
+}: {
+  month: string;
+  year: string;
+}) {
+  const dashboard = await getDashboard(month, year);
+  return <SummaryCards {...dashboard} />;
+}
+
+async function PieChartData({ month, year }: { month: string; year: string }) {
+  const dashboard = await getDashboard(month, year);
+  return <TransactionsPieChart {...dashboard} />;
+}
+
+async function ExpensesData({ month, year }: { month: string; year: string }) {
+  const dashboard = await getDashboard(month, year);
+  return (
+    <ExpensesPerCategory
+      expensesPerCategory={dashboard.totalExpensePerCategory}
+    />
+  );
+}
+
+async function LastTransactionsData({
+  month,
+  year,
+}: {
+  month: string;
+  year: string;
+}) {
+  const dashboard = await getDashboard(month, year);
+  return <LastTransactions lastTransactions={dashboard.lastTransactions} />;
+}
+
+async function HistoryChartData({ year }: { year: string }) {
+  const historicalData = await getHistoricalData(year);
+  return <MonthlyHistoryChart data={historicalData} selectedYear={year} />;
+}
+
+// --- Página Principal ---
 
 interface HomeProps {
   searchParams: Promise<{ month?: string; year?: string }>;
@@ -34,21 +86,11 @@ export default async function Home({ searchParams }: HomeProps) {
     redirect("/authentication");
   }
 
-  // Define o mês e ano: parâmetro da URL > mês/ano atual > Janeiro/ano atual
   const currentDate = new Date();
   const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
   const currentYear = String(currentDate.getFullYear());
   const selectedMonth = month ?? currentMonth;
   const selectedYear = year ?? currentYear;
-
-  // Buscar dados do dashboard atual
-  const dashboard = await getDashboard(selectedMonth, selectedYear);
-
-  // Buscar dados históricos do ano
-  const historicalData = await getHistoricalData(selectedYear);
-
-  // Buscar dados de comparação
-  // const comparisonData = await getComparisonData(selectedMonth, selectedYear);
 
   return (
     <div>
@@ -58,40 +100,39 @@ export default async function Home({ searchParams }: HomeProps) {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <div className="flex items-center gap-4">
             <AITransactionButton />
-
             <GenerateReportButton month={selectedMonth} year={selectedYear} />
-
-            <TimeSelect
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
-            />
+            <Suspense fallback={<TimeSelectSkeleton />}>
+              <TimeSelect
+                selectedMonth={selectedMonth}
+                selectedYear={selectedYear}
+              />
+            </Suspense>
           </div>
         </div>
 
-        {/* Seção principal com resumo e transações */}
         <div className="grid grid-cols-[2fr,1fr] gap-6">
           <div className="flex flex-col gap-6">
-            <SummaryCards {...dashboard} />
+            <Suspense fallback={<SummaryCardsSkeleton />}>
+              <SummaryCardsData month={selectedMonth} year={selectedYear} />
+            </Suspense>
             <div className="grid grid-cols-3 grid-rows-1 gap-6">
-              <TransactionsPieChart {...dashboard} />
-              <ExpensesPerCategory
-                expensesPerCategory={dashboard.totalExpensePerCategory}
-              />
+              <Suspense fallback={<TransactionsPieChartSkeleton />}>
+                <PieChartData month={selectedMonth} year={selectedYear} />
+              </Suspense>
+              <Suspense fallback={<ExpensesPerCategorySkeleton />}>
+                <ExpensesData month={selectedMonth} year={selectedYear} />
+              </Suspense>
             </div>
           </div>
-          <LastTransactions lastTransactions={dashboard.lastTransactions} />
+          <Suspense fallback={<LastTransactionsSkeleton />}>
+            <LastTransactionsData month={selectedMonth} year={selectedYear} />
+          </Suspense>
         </div>
 
-        {/* Seção de gráficos históricos */}
         <div className="space-y-6">
-          {/* Gráfico de histórico mensal */}
-          <MonthlyHistoryChart
-            data={historicalData}
-            selectedYear={selectedYear}
-          />
-
-          {/* Gráficos de comparação */}
-          {/* <ComparisonChart data={comparisonData} /> */}
+          <Suspense fallback={<MonthlyHistoryChartSkeleton />}>
+            <HistoryChartData year={selectedYear} />
+          </Suspense>
         </div>
       </div>
     </div>
