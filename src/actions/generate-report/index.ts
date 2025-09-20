@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { TRANSACTION_CATEGORY_LABELS } from "@/constants/transactions";
@@ -108,6 +109,9 @@ export async function generateReport(
         error: "Falha ao gerar relatório com IA. Tente novamente.",
       };
     }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/transactions");
 
     // Retornar dados para o modal e PDF
     return {
