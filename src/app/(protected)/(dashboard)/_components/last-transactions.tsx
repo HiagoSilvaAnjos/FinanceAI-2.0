@@ -12,7 +12,6 @@ import {
 import { transactionTable } from "@/db/schema";
 import { formatCurrency } from "@/lib/currency";
 
-// Tipo inferido da tabela Drizzle
 type Transaction = InferSelectModel<typeof transactionTable>;
 
 interface SerializedTransaction extends Omit<Transaction, "amount"> {
@@ -42,7 +41,7 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
   };
 
   return (
-    <ScrollArea className="rounded-md border">
+    <ScrollArea className="max-h-[900px] rounded-md border">
       <CardHeader className="mb-2 mt-4 flex items-center justify-between">
         <CardTitle className="font-bold">Suas últimas transações</CardTitle>
         <Button className="rounded-full font-medium text-white" asChild>
