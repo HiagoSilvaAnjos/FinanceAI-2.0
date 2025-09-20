@@ -7,7 +7,7 @@ import SignUpForm from "./components/sign-up-form";
 
 const Authentication = async () => {
   return (
-    <div className="grid h-screen grid-cols-2">
+    <div className="grid h-screen grid-cols-1 md:grid-cols-2">
       <div className="mx-auto flex h-full max-w-[550px] flex-col justify-center p-8">
         <Image
           src="/logo.svg"
@@ -17,7 +17,7 @@ const Authentication = async () => {
           className="mb-8"
         />
         <h1 className="mb-3 text-4xl font-bold">Seja Bem vindo</h1>
-        <p className="text-muted-foreground mb-8 text-justify">
+        <p className="mb-8 text-justify text-muted-foreground">
           A Finance AI é uma plataforma de gestão financeira que utiliza IA para
           monitorar suas movimentações, e oferecer insights personalizados,
           facilitando o controle do seu orçamento.
@@ -48,7 +48,7 @@ const Authentication = async () => {
         </div>
       </div>
 
-      <div className="relative h-full w-full">
+      <div className="relative hidden h-full w-full md:block">
         <Image
           src="/banner-authentication.png"
           alt="Faça login"

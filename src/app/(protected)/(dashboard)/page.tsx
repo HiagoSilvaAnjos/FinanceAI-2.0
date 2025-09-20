@@ -37,9 +37,9 @@ async function DashboardHeader({
   const { hasTransactions, usage } = await getUsageAndTransactionCount();
 
   return (
-    <div className="flex justify-between">
+    <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <Suspense fallback={<Skeleton className="h-9 w-28 rounded-full" />}>
           <AIUsageButton />
         </Suspense>
@@ -128,12 +128,12 @@ export default async function Home({ searchParams }: HomeProps) {
           <DashboardHeader month={selectedMonth} year={selectedYear} />
         </Suspense>
 
-        <div className="grid grid-cols-[2fr,1fr] gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr,1fr]">
           <div className="flex flex-col gap-6">
             <Suspense fallback={<SummaryCardsSkeleton />}>
               <SummaryCardsData month={selectedMonth} year={selectedYear} />
             </Suspense>
-            <div className="grid grid-cols-3 grid-rows-1 gap-6">
+            <div className="grid grid-cols-1 grid-rows-1 gap-6 md:grid-cols-3">
               <Suspense fallback={<TransactionsPieChartSkeleton />}>
                 <PieChartData month={selectedMonth} year={selectedYear} />
               </Suspense>

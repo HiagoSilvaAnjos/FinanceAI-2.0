@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  ChevronDown,
+  ChevronUp, // Importe o ChevronUp
   LoaderCircleIcon,
   LogOutIcon,
   MailIcon,
@@ -40,6 +42,7 @@ const User = () => {
 
   const [signOutIsLoading, setSignOutIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar o menu
 
   useEffect(() => {
     const body = document.documentElement;
@@ -92,7 +95,7 @@ const User = () => {
   const avatarFallback = getAvatarFallback(session?.user?.name);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger asChild>
         <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-2 py-2 transition ease-in-out hover:bg-zinc-900">
           <Avatar>
@@ -101,6 +104,9 @@ const User = () => {
           </Avatar>
 
           <h3 className="text-base font-medium">{displayedName}</h3>
+
+          {/* Renderização condicional do ícone */}
+          {isMenuOpen ? <ChevronUp /> : <ChevronDown />}
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64" align="end">
@@ -117,13 +123,17 @@ const User = () => {
             <DropdownMenuPortal>
               <DropdownMenuSubContent sideOffset={10} className="w-25">
                 <DropdownMenuItem
-                  className={`flex cursor-pointer justify-between ${!isDarkMode ? "bg-accent" : ""}`}
+                  className={`flex cursor-pointer justify-between ${
+                    !isDarkMode ? "bg-accent" : ""
+                  }`}
                   onClick={() => toggleTheme()}
                 >
                   Claro <SunIcon />
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className={`flex cursor-pointer justify-between ${isDarkMode ? "bg-accent" : ""}`}
+                  className={`flex cursor-pointer justify-between ${
+                    isDarkMode ? "bg-accent" : ""
+                  }`}
                   onClick={() => toggleTheme()}
                 >
                   Escuro <MoonIcon />
