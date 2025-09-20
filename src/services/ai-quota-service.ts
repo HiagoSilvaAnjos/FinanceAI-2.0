@@ -14,7 +14,7 @@ export const AI_LIMITS = {
     resetHours: 24,
   },
   AI_REPORT: {
-    limit: 3,
+    limit: 5,
     resetPeriod: "monthly" as const,
     resetHours: 24 * 30,
   },

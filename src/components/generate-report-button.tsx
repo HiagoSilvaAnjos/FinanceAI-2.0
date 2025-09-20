@@ -144,7 +144,7 @@ const GenerateReportButton = ({
 
       {/* Modal de Quota Excedida */}
       <Dialog open={showQuotaDialog} onOpenChange={setShowQuotaDialog}>
-        <DialogContent className="max-h-[90vh] max-w-md p-0 sm:max-h-[85vh]">
+        <DialogContent className="max-h-[90vh] w-[90%] max-w-md p-0 sm:max-h-[85vh]">
           <div className="flex-shrink-0 p-6 pb-0">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
@@ -192,7 +192,7 @@ const GenerateReportButton = ({
 
       {/* Modal do Relatório */}
       <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-        <DialogContent className="max-h-[90vh] max-w-4xl p-0 sm:max-h-[85vh]">
+        <DialogContent className="max-h-[90vh] w-[90%] max-w-4xl p-0 sm:max-h-[85vh]">
           <div className="flex-shrink-0 p-6 pb-0">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">

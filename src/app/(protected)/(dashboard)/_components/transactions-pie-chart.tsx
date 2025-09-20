@@ -58,7 +58,7 @@ const TransactionsPieChart = ({
         {hasTransactions ? (
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-w-sm"
+            className="mx-auto aspect-square w-full md:max-w-sm"
           >
             <PieChart>
               <ChartTooltip

@@ -24,7 +24,7 @@ const SummaryCards = async ({
         tooltipText="O saldo representa o valor que você tem disponível após todas as despesas."
       />
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <SummaryCard
           icon={<TrendingUpIcon size={16} className="text-primary" />}
           title="Receita"

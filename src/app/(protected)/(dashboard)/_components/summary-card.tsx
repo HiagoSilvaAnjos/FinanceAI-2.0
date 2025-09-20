@@ -60,12 +60,12 @@ const SummaryCard = ({
           </Button>
         )}
       </CardHeader>
-      <CardContent className="flex justify-between">
+      <CardContent className="flex flex-col gap-6 md:flex-row md:justify-between">
         {showExplanation ? (
           <p className={`font-medium text-white`}>{explanation}</p>
         ) : (
           <p
-            className={`font-bold ${size === "small" ? "text-2xl" : `text-4xl ${amount < 0 ? "text-red-600" : "text-primary"}`}`}
+            className={`font-bold ${size === "small" ? "text-2xl" : `text-2xl md:text-4xl ${amount < 0 ? "text-red-600" : "text-primary"}`}`}
           >
             {formattedAmount}
           </p>

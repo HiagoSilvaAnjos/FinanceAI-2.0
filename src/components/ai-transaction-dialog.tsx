@@ -115,7 +115,7 @@ const AITransactionDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-h-[90vh] max-w-2xl p-0 sm:max-h-[85vh]">
+      <DialogContent className="max-h-[90vh] w-[90%] max-w-2xl p-0 sm:max-h-[85vh]">
         {/* Header fixo */}
         <div className="flex-shrink-0 p-6 pb-0">
           <DialogHeader>
@@ -312,7 +312,7 @@ const AITransactionDialog = ({
               <Button
                 onClick={handleSubmit}
                 disabled={!userInput.trim() || isProcessing}
-                className="flex items-center gap-2"
+                className="mb-2 flex items-center gap-2 md:mb-0"
               >
                 {isProcessing ? (
                   <>

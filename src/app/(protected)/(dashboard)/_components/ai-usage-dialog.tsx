@@ -27,7 +27,7 @@ export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] max-w-md p-0 sm:max-h-[85vh]">
+      <DialogContent className="max-h-[90vh] w-[90%] max-w-md p-0 sm:max-h-[85vh]">
         {/* Header fixo */}
         <div className="flex-shrink-0 p-6 pb-0">
           <DialogHeader>
