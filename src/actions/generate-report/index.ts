@@ -108,7 +108,7 @@ export async function generateReport(
       };
     }
 
-    // Retornar dados para o PDF
+    // Retornar dados para o modal e PDF
     return {
       success: true,
       content: reportContent,

@@ -36,73 +36,60 @@ export async function generateFinancialReport(
   data: FinancialData,
 ): Promise<string> {
   const prompt = `
-  Como um especialista em análise financeira pessoal, crie um relatório detalhado e profissional baseado nos seguintes dados financeiros de ${data.currentMonth}/${data.currentYear}:
+Gere um relatório com insights sobre as minhas finanças, com dicas e orientações de como melhorar minha vida financeira, seja criativa e escreva bastante para ajudar o usuário. O relatório deve ser escrito de uma perspectiva do período:
 
-  DADOS FINANCEIROS:
-  - Saldo atual: R$ ${data.balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-  - Total de receitas: R$ ${data.depositsTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-  - Total de despesas: R$ ${data.expensesTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+De um olá e informe que este é um relatório financeiro gerado por IA.
 
-  DESPESAS POR CATEGORIA:
-  ${data.totalExpensePerCategory
-    .map(
-      (cat) =>
-        `- ${cat.category}: R$ ${cat.totalAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${cat.percentageOfTotal}%)`,
-    )
-    .join("\n")}
+PERIODO: ${data.currentMonth}/${data.currentYear}
 
-  ÚLTIMAS TRANSAÇÕES:
-  ${data.lastTransactions
-    .slice(0, 10)
-    .map(
-      (t) =>
-        `- ${t.name}: R$ ${Number(t.amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${t.type === "EXPENSE" ? "Despesa" : "Receita"}) - ${new Date(t.date).toLocaleDateString("pt-BR")}`,
-    )
-    .join("\n")}
+Use textos com parágrafos, evite criar no formato de tabelas ou lista com | ou ---
+não crie formatos como: "| Categoria | Valor | % do total de despesas | |-----------|-------|------------------------| | Alimentação | R$ 85,00 | 6% | | Pets | R$ 1.000,00 | 70% | | Utilidades | R$ 120,00 | 8% | | Compras | R$ 216,67 | 15% |"
 
-  ${
-    data.historicalData
-      ? `
-  DADOS HISTÓRICOS (${data.currentYear}):
-  ${data.historicalData
-    .map(
-      (h) =>
-        `- ${h.monthName}: Receitas R$ ${h.deposits.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}, Despesas R$ ${h.expenses.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}, Saldo R$ ${h.balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-    )
-    .join("\n")}
-  `
-      : ""
-  }
+apenas parágrafos com textos.
 
-  Por favor, atue como um consultor financeiro e crie um relatório profissional em português brasileiro. Use uma linguagem simples e clara, evitando jargão técnico, e foque em soluções práticas. O relatório deve conter as seguintes seções:
+INFORMAÇÕES IMPORTANTES:
+- Saldo: R$ ${data.balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+- Receitas: R$ ${data.depositsTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+- Despesas: R$ ${data.expensesTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
 
-  1. Resumo Executivo: Visão geral da situação financeira atual.
-  2. Análise de Ganhos e Gastos: Análise detalhada de receitas e despesas.
-  3. Despesas por Categoria: Insights sobre onde o dinheiro está sendo gasto.
-  4. Pontos de Melhoria: Alertas sobre gastos ou categorias que merecem atenção.
-  5. Plano de Ação: Sugestões práticas para melhorar a saúde financeira.
-  6. Próximos Passos: Sugestões de metas financeiras realistas para o próximo período.
+DESPESAS POR CATEGORIA:
+${data.totalExpensePerCategory
+  .map(
+    (cat) =>
+      `- ${cat.category}: R$ ${cat.totalAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${cat.percentageOfTotal}%)`,
+  )
+  .join("\n")}
 
-  IMPORTANTE - FORMATAÇÃO:
-  - Use apenas #, ##, ou ### para títulos e subtítulos. Não adicione asteriscos ou outros caracteres de negrito aos títulos.
-  - O conteúdo deve ser em texto simples e limpo.
-  - Máximo de 1000 palavras.
-
-  Base todas as análises nos números reais apresentados.
+ÚLTIMAS TRANSAÇÕES:
+${data.lastTransactions
+  .slice(0, 10)
+  .map(
+    (t) =>
+      `- ${t.name}: R$ ${Number(t.amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${t.type === "EXPENSE" ? "Despesa" : "Receita"})`,
+  )
+  .join("\n")}
   `;
 
   try {
     const completion = await groq.chat.completions.create({
       messages: [
         {
+          role: "system",
+          content:
+            "Você é um consultor financeiro experiente. Crie relatórios objetivos, práticos e bem formatados em markdown limpo.",
+        },
+        {
           role: "user",
           content: prompt,
         },
       ],
-      model: "llama-3.1-8b-instant",
+      // model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-20b",
       temperature: 0.3,
       max_tokens: 4000,
     });
+
+    console.log(completion.choices[0]?.message?.content);
 
     return completion.choices[0]?.message?.content || "Erro ao gerar relatório";
   } catch (error) {
