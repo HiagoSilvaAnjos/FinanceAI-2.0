@@ -39,7 +39,7 @@ export async function generateFinancialReport(
   const prompt = `
 Gere um relatório com insights sobre as minhas finanças, com dicas e orientações de como melhorar minha vida financeira, seja criativa e escreva bastante para ajudar o usuário. O relatório deve ser escrito de uma perspectiva do período:
 
-De um olá para ${data.userName} e informe que este é um relatório financeiro gerado por IA.
+De um olá para ${data.userName} e informe que este é um relatório financeiro gerado por IA. no olá use ## no lugar de *
 
 PERIODO: ${data.currentMonth}/${data.currentYear}
 
