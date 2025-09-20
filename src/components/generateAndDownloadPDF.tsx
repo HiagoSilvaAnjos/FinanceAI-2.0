@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/alt-text */
 "use client";
 
 import {
   Document,
+  Image,
   Page,
   pdf,
   StyleSheet,
@@ -34,10 +36,10 @@ interface ReportData {
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
-    fontSize: 10,
+    fontSize: 11,
     paddingTop: 40,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 40,
+    paddingRight: 40,
     paddingBottom: 40,
     backgroundColor: "#FFFFFF",
   },
@@ -45,24 +47,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#181920",
     padding: 15,
     marginBottom: 20,
-    marginLeft: -20,
-    marginRight: -20,
+    marginLeft: -40,
+    marginRight: -40,
     marginTop: -40,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
+  headerText: {},
   headerTitle: {
     color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Helvetica-Bold",
     marginBottom: 5,
   },
   headerSubtitle: {
     color: "#FFFFFF",
     fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: "Helvetica-Bold",
+  },
+  logo: {
+    width: 90,
+    height: 20,
   },
   reportTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontFamily: "Helvetica-Bold",
     color: "#55B02E",
     marginBottom: 10,
   },
@@ -70,7 +80,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 15,
-    fontSize: 9,
+    fontSize: 10,
     color: "#333333",
   },
   summaryContainer: {
@@ -102,13 +112,13 @@ const styles = StyleSheet.create({
     borderLeft: "3px solid #DC2626",
   },
   cardLabel: {
-    fontSize: 8,
+    fontSize: 9,
     marginBottom: 3,
-    fontWeight: "normal",
+    fontFamily: "Helvetica",
   },
   cardValue: {
-    fontSize: 11,
-    fontWeight: "bold",
+    fontSize: 12,
+    fontFamily: "Helvetica-Bold",
   },
   revenueText: {
     color: "#166534",
@@ -123,45 +133,45 @@ const styles = StyleSheet.create({
     color: "#991B1B",
   },
   analysisTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontFamily: "Helvetica-Bold",
     color: "#55B02E",
     marginBottom: 10,
   },
   contentContainer: {
-    lineHeight: 1.5,
+    lineHeight: 1.6,
   },
   h1: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontFamily: "Helvetica-Bold",
     color: "#55B02E",
     marginTop: 15,
     marginBottom: 8,
   },
   h2: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#333333",
+    fontSize: 14,
+    fontFamily: "Helvetica-Bold",
+    color: "#55B02E", // Cor verde aplicada
     marginTop: 12,
     marginBottom: 6,
   },
   h3: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: "#333333",
+    fontSize: 12,
+    fontFamily: "Helvetica-Bold",
+    color: "#55B02E", // Cor verde aplicada
     marginTop: 10,
     marginBottom: 5,
   },
   paragraph: {
-    fontSize: 9,
-    lineHeight: 1.4,
+    fontSize: 11,
+    lineHeight: 1.5,
     marginBottom: 8,
     color: "#333333",
     textAlign: "justify",
   },
   bulletPoint: {
-    fontSize: 9,
-    lineHeight: 1.4,
+    fontSize: 11,
+    lineHeight: 1.5,
     marginBottom: 4,
     marginLeft: 10,
     color: "#333333",
@@ -169,8 +179,8 @@ const styles = StyleSheet.create({
   footer: {
     position: "absolute",
     bottom: 20,
-    left: 20,
-    right: 20,
+    left: 40,
+    right: 40,
     flexDirection: "row",
     justifyContent: "space-between",
     fontSize: 8,
@@ -191,7 +201,13 @@ const formatCurrency = (value: number): string => {
 
 // Component to parse and render markdown content
 const MarkdownRenderer: React.FC<{ content: string }> = ({ content }) => {
-  const lines = content.split("\n").filter((line) => line.trim() !== "");
+  const cleanedContent = content
+    .replace(/R\$\s*\/?\s*/g, "R$ ")
+    .replace(/(\d+)\s*\/?\s*%/g, "$1%");
+
+  const lines = cleanedContent
+    .split("\n")
+    .filter((line) => line.trim() !== "" && line.trim() !== "---");
 
   return (
     <View style={styles.contentContainer}>
@@ -218,23 +234,41 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({ content }) => {
           );
         } else if (
           trimmedLine.startsWith("- ") ||
+          trimmedLine.startsWith("• ") ||
           trimmedLine.startsWith("* ")
         ) {
+          const lineContent = trimmedLine.substring(2);
+          const parts = lineContent.split(/(\*\*.*?\*\*)/g).filter(Boolean);
+
           return (
             <Text key={index} style={styles.bulletPoint}>
-              • {trimmedLine.substring(2)}
+              <Text>• </Text>
+              {parts.map((part, i) => {
+                if (part.startsWith("**") && part.endsWith("**")) {
+                  return (
+                    <Text key={i} style={{ fontFamily: "Helvetica-Bold" }}>
+                      {part.slice(2, -2)}
+                    </Text>
+                  );
+                }
+                return <Text key={i}>{part}</Text>;
+              })}
             </Text>
           );
         } else if (trimmedLine.length > 0) {
-          // Remove markdown formatting from paragraphs
-          const cleanText = trimmedLine
-            .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markdown
-            .replace(/\*(.*?)\*/g, "$1") // Remove italic markdown
-            .replace(/`(.*?)`/g, "$1"); // Remove code markdown
-
+          const parts = trimmedLine.split(/(\*\*.*?\*\*)/g).filter(Boolean);
           return (
             <Text key={index} style={styles.paragraph}>
-              {cleanText}
+              {parts.map((part, i) => {
+                if (part.startsWith("**") && part.endsWith("**")) {
+                  return (
+                    <Text key={i} style={{ fontFamily: "Helvetica-Bold" }}>
+                      {part.slice(2, -2)}
+                    </Text>
+                  );
+                }
+                return <Text key={i}>{part}</Text>;
+              })}
             </Text>
           );
         }
@@ -256,10 +290,13 @@ const FinancialReportPDF: React.FC<{ reportData: ReportData }> = ({
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>FinanceAI</Text>
-          <Text style={styles.headerSubtitle}>
-            Relatório Financeiro Inteligente
-          </Text>
+          <View style={styles.headerText}>
+            <Text style={styles.headerTitle}>FinanceAI</Text>
+            <Text style={styles.headerSubtitle}>
+              Relatório Financeiro Inteligente
+            </Text>
+          </View>
+          <Image style={styles.logo} src="/logo.png" />
         </View>
 
         {/* Report Title */}
@@ -355,7 +392,10 @@ export const generateAndDownloadPDF = async (
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `relatorio-financeAI-${reportData.userData.period.replace("/", "-")}.pdf`;
+    link.download = `relatorio-financeAI-${reportData.userData.period.replace(
+      "/",
+      "-",
+    )}.pdf`;
 
     // Trigger download
     document.body.appendChild(link);
