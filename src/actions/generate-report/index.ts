@@ -7,7 +7,7 @@ import { getDashboard } from "@/data/get-dashboard";
 import { getHistoricalData } from "@/data/get-historical-data";
 import { auth } from "@/lib/auth";
 import { checkAIQuota, incrementAIUsage } from "@/services/ai-quota-service";
-import { generateFinancialReport } from "@/services/groq-service";
+import { generateFinancialReport } from "@/services/ai-transaction-report";
 
 interface ReportResult {
   success: boolean;
@@ -72,6 +72,7 @@ export async function generateReport(
 
     // Preparar dados para a IA
     const aiData = {
+      userName: session.user.name || "Usuário",
       currentMonth: month,
       currentYear: year,
       balance: dashboardData.balance,

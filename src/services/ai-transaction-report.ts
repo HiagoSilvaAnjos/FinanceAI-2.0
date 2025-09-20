@@ -5,6 +5,7 @@ const groq = new Groq({
 });
 
 interface FinancialData {
+  userName: string;
   currentMonth: string;
   currentYear: string;
   balance: number;
@@ -38,25 +39,33 @@ export async function generateFinancialReport(
   const prompt = `
 Gere um relatório com insights sobre as minhas finanças, com dicas e orientações de como melhorar minha vida financeira, seja criativa e escreva bastante para ajudar o usuário. O relatório deve ser escrito de uma perspectiva do período:
 
-De um olá e informe que este é um relatório financeiro gerado por IA.
+De um olá para ${data.userName} e informe que este é um relatório financeiro gerado por IA.
 
 PERIODO: ${data.currentMonth}/${data.currentYear}
 
 Use textos com parágrafos, evite criar no formato de tabelas ou lista com | ou ---
-não crie formatos como: "| Categoria | Valor | % do total de despesas | |-----------|-------|------------------------| | Alimentação | R$ 85,00 | 6% | | Pets | R$ 1.000,00 | 70% | | Utilidades | R$ 120,00 | 8% | | Compras | R$ 216,67 | 15% |"
+não crie formatos como: "| Categoria | Valor | % do total de despesas | |-----------|-------|------------------------| | Alimentação | R$ 85,00 | 6% | | Pets | R$ 1.000,00 | 70% | | Utilidades | R$ 120,00 | 8% | | Compras | R$ 216,67 | 15% |"
 
 apenas parágrafos com textos.
 
 INFORMAÇÕES IMPORTANTES:
-- Saldo: R$ ${data.balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-- Receitas: R$ ${data.depositsTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-- Despesas: R$ ${data.expensesTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+- Saldo: R$ ${data.balance.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+  })}
+- Receitas: R$ ${data.depositsTotal.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+  })}
+- Despesas: R$ ${data.expensesTotal.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+  })}
 
 DESPESAS POR CATEGORIA:
 ${data.totalExpensePerCategory
   .map(
     (cat) =>
-      `- ${cat.category}: R$ ${cat.totalAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${cat.percentageOfTotal}%)`,
+      `- ${cat.category}: R$ ${cat.totalAmount.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })} (${cat.percentageOfTotal}%)`,
   )
   .join("\n")}
 
@@ -65,7 +74,9 @@ ${data.lastTransactions
   .slice(0, 10)
   .map(
     (t) =>
-      `- ${t.name}: R$ ${Number(t.amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (${t.type === "EXPENSE" ? "Despesa" : "Receita"})`,
+      `- ${t.name}: R$ ${Number(t.amount).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+      })} (${t.type === "EXPENSE" ? "Despesa" : "Receita"})`,
   )
   .join("\n")}
   `;
