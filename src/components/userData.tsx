@@ -121,33 +121,64 @@ const User = () => {
               <MailIcon size={20} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Tema</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent sideOffset={10} className="w-25">
-                <DropdownMenuItem
-                  className={`flex cursor-pointer justify-between ${
-                    !isDarkMode ? "bg-accent" : ""
-                  }`}
-                  onClick={() => {
-                    if (isDarkMode) toggleTheme();
-                  }}
-                >
-                  Claro <SunIcon />
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className={`flex cursor-pointer justify-between ${
-                    isDarkMode ? "bg-accent" : ""
-                  }`}
-                  onClick={() => {
-                    if (!isDarkMode) toggleTheme();
-                  }}
-                >
-                  Escuro <MoonIcon />
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+
+          {/* Para desktop - usar submenu */}
+          <div className="hidden sm:block">
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Tema</DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent sideOffset={10} className="w-25">
+                  <DropdownMenuItem
+                    className={`flex cursor-pointer justify-between ${
+                      !isDarkMode ? "bg-accent" : ""
+                    }`}
+                    onClick={() => {
+                      if (isDarkMode) toggleTheme();
+                    }}
+                  >
+                    Claro <SunIcon />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={`flex cursor-pointer justify-between ${
+                      isDarkMode ? "bg-accent" : ""
+                    }`}
+                    onClick={() => {
+                      if (!isDarkMode) toggleTheme();
+                    }}
+                  >
+                    Escuro <MoonIcon />
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          </div>
+
+          {/* Para mobile - mostrar diretamente no menu principal */}
+          <div className="block sm:hidden">
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              Tema
+            </DropdownMenuLabel>
+            <DropdownMenuItem
+              className={`flex cursor-pointer justify-between ${
+                !isDarkMode ? "bg-accent" : ""
+              }`}
+              onClick={() => {
+                if (isDarkMode) toggleTheme();
+              }}
+            >
+              Claro <SunIcon />
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className={`flex cursor-pointer justify-between ${
+                isDarkMode ? "bg-accent" : ""
+              }`}
+              onClick={() => {
+                if (!isDarkMode) toggleTheme();
+              }}
+            >
+              Escuro <MoonIcon />
+            </DropdownMenuItem>
+          </div>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />

@@ -28,7 +28,7 @@ const Authentication = async () => {
           monitorar suas movimentações, e oferecer insights personalizados,
           facilitando o controle do seu orçamento.
         </p>
-        <div className="flex w-full flex-col gap-6">
+        <div className="flex w-full flex-col gap-6 bg-white/5">
           <Card>
             <CardHeader>
               <CardTitle className="text-xl">Entrar com Google</CardTitle>
