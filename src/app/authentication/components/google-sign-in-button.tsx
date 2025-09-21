@@ -33,7 +33,7 @@ const GoogleSignInButton = () => {
   return (
     <Button
       variant="outline"
-      className="w-full cursor-pointer bg-white font-semibold text-black"
+      className="w-full cursor-pointer font-semibold text-muted-foreground"
       onClick={handleSignInWithGoogle}
       type="button"
       disabled={isGoogleLoading}
