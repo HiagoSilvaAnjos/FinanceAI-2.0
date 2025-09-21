@@ -1,9 +1,15 @@
 import Image from "next/image";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-import SignInForm from "./components/sign-in-form";
-import SignUpForm from "./components/sign-up-form";
+import GoogleSignInButton from "./components/google-sign-in-button";
 
 const Authentication = async () => {
   return (
@@ -13,7 +19,7 @@ const Authentication = async () => {
           src="/logo.svg"
           width={173}
           height={39}
-          alt="Finace AI"
+          alt="Finance AI"
           className="mb-8"
         />
         <h1 className="mb-3 text-4xl font-bold">Seja Bem vindo</h1>
@@ -23,28 +29,23 @@ const Authentication = async () => {
           facilitando o controle do seu orçamento.
         </p>
         <div className="flex w-full max-w-sm flex-col gap-6">
-          <Tabs defaultValue="sign-in">
-            <TabsList>
-              <TabsTrigger
-                className="cursor-pointer px-8 py-4 transition duration-300 ease-in-out hover:bg-gray-500/30"
-                value="sign-in"
-              >
-                Entrar
-              </TabsTrigger>
-              <TabsTrigger
-                className="cursor-pointer px-8 py-4 transition duration-300 ease-in-out hover:bg-gray-500/30"
-                value="sign-up"
-              >
-                Criar Conta
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="sign-in">
-              <SignInForm />
-            </TabsContent>
-            <TabsContent value="sign-up">
-              <SignUpForm />
-            </TabsContent>
-          </Tabs>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Entrar com Google</CardTitle>
+              <CardDescription className="text-white">
+                Faça login para continuar usando sua conta Google.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-6">
+              <GoogleSignInButton />
+            </CardContent>
+            <CardFooter className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Ao continuar, você concorda com nossos termos de uso e política
+                de privacidade.
+              </p>
+            </CardFooter>
+          </Card>
         </div>
       </div>
 
