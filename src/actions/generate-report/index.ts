@@ -71,6 +71,10 @@ export async function generateReport(
     // Buscar dados históricos
     const historicalData = await getHistoricalData(year);
 
+    const currentMonthIndex = parseInt(month) - 1;
+    const previousMonthData =
+      historicalData[currentMonthIndex > 0 ? currentMonthIndex - 1 : 11];
+
     // Preparar dados para a IA
     const aiData = {
       userName: session.user.name || "Usuário",
@@ -94,6 +98,11 @@ export async function generateReport(
         paymentMethod: t.paymentMethod,
         date: t.date.toISOString(),
       })),
+      previousMonthData: {
+        monthName: previousMonthData.monthName,
+        deposits: previousMonthData.deposits,
+        expenses: previousMonthData.expenses,
+      },
       historicalData,
     };
 

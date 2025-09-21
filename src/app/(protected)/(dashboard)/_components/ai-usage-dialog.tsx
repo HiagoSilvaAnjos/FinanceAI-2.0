@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { BrainCircuit, CheckCircle, Clock, XCircle } from "lucide-react";
+import {
+  BrainCircuit,
+  CheckCircle,
+  Clock,
+  MessageSquare,
+  XCircle,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +29,7 @@ interface AIUsageDialogProps {
 export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
   const transactionUsage = usage.transactions;
   const reportUsage = usage.reports;
+  const chatUsage = usage.chat;
 
   return (
     <Dialog>
@@ -92,6 +99,33 @@ export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>Reinicia em: {reportUsage.timeUntilReset}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Uso do Chatbot com IA */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="flex items-center gap-2 font-medium">
+                  <MessageSquare className="h-4 w-4" />
+                  Conversas com o Assistente
+                </h3>
+                {chatUsage.hasQuota ? (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-500" />
+                )}
+              </div>
+              <Progress
+                value={(chatUsage.currentUsage / chatUsage.limit) * 100}
+              />
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>
+                  Uso: {chatUsage.currentUsage} / {chatUsage.limit}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>Reinicia em: {chatUsage.timeUntilReset}</span>
                 </div>
               </div>
             </div>

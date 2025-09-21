@@ -31,6 +31,11 @@ interface FinancialData {
     expenses: number;
     balance: number;
   }>;
+  previousMonthData: {
+    monthName: string;
+    deposits: number;
+    expenses: number;
+  };
 }
 
 export async function generateFinancialReport(
@@ -79,6 +84,13 @@ ${data.lastTransactions
       })} (${t.type === "EXPENSE" ? "Despesa" : "Receita"})`,
   )
   .join("\n")}
+
+ - Mês Anterior (${data.previousMonthData.monthName}):
+      - Receitas: R$ ${data.previousMonthData.deposits}
+      - Despesas: R$ ${data.previousMonthData.expenses}
+
+  se tiver dados do mes anterior, Compare os resultados deste mês com o mês anterior (${data.previousMonthData.monthName}). Destaque as principais variações (aumento ou diminuição) em receitas e despesas e o que isso pode significar. Caso esse mes não tenha dados, apenas ignore essa parte e não adicione no relatório
+
   `;
 
   try {

@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 
+import { ChatbotDialog } from "@/components/chatbot-dialog";
 import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
@@ -28,6 +29,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <ChatbotDialog />
       </body>
     </html>
   );

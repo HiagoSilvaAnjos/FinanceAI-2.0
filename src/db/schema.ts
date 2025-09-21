@@ -196,7 +196,7 @@ export const aiUsageTable = pgTable(
       .notNull()
       .references(() => userTable.id, { onDelete: "cascade" }),
     featureType: text("feature_type", {
-      enum: ["AI_TRANSACTION", "AI_REPORT"],
+      enum: ["AI_TRANSACTION", "AI_REPORT", "AI_CHAT"],
     }).notNull(),
     usageDate: date("usage_date").defaultNow().notNull(),
     usageCount: integer("usage_count").notNull().default(0),

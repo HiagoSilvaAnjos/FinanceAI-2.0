@@ -1,4 +1,5 @@
 import { and, eq, gte, sql } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -17,6 +18,11 @@ export const AI_LIMITS = {
     limit: 5,
     resetPeriod: "monthly" as const,
     resetHours: 24 * 30,
+  },
+  AI_CHAT: {
+    limit: 10,
+    resetPeriod: "daily" as const,
+    resetHours: 24,
   },
 } as const;
 
@@ -112,7 +118,6 @@ export async function incrementAIUsage(
   const userId = session.user.id;
   const today = new Date().toISOString().split("T")[0];
 
-  // Usar UPSERT para incrementar ou criar
   await db
     .insert(aiUsageTable)
     .values({
@@ -132,6 +137,9 @@ export async function incrementAIUsage(
         updatedAt: new Date(),
       },
     });
+
+  revalidatePath("/");
+  revalidatePath("/transactions");
 }
 
 /**
@@ -160,11 +168,13 @@ function formatTimeUntilReset(now: Date, resetDate: Date): string {
 export async function getAIUsageStats(): Promise<{
   transactions: QuotaCheck;
   reports: QuotaCheck;
+  chat: QuotaCheck;
 }> {
-  const [transactions, reports] = await Promise.all([
+  const [transactions, reports, chat] = await Promise.all([
     checkAIQuota("AI_TRANSACTION"),
     checkAIQuota("AI_REPORT"),
+    checkAIQuota("AI_CHAT"),
   ]);
 
-  return { transactions, reports };
+  return { transactions, reports, chat };
 }
