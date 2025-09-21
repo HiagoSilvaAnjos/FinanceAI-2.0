@@ -8,7 +8,11 @@ import { auth } from "@/lib/auth";
 
 import { TotalExpensePerCategory, TransactionPercentagePerType } from "./types";
 
-export const getDashboard = async (month: string, year: string) => {
+export const getDashboard = async (
+  month: string,
+  year: string,
+  transactionLimit: number = 15,
+) => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -87,7 +91,7 @@ export const getDashboard = async (month: string, year: string) => {
     .from(transactionTable)
     .where(baseWhere)
     .orderBy(desc(transactionTable.date))
-    .limit(15);
+    .limit(transactionLimit);
 
   const lastTransactions = lastTransactionsResult.map((transaction) => ({
     ...transaction,

@@ -18,6 +18,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
+import { Textarea } from "./ui/textarea";
+
 interface Message {
   text: string;
   sender: "user" | "bot";
@@ -205,7 +207,7 @@ export const ChatbotDialog = () => {
                       key={s}
                       variant="outline"
                       size="sm"
-                      className="w-full md:w-auto"
+                      className="w-fit px-2 py-1 text-xs md:w-auto"
                       onClick={() => sendMessage(s)}
                     >
                       {s}
@@ -217,8 +219,11 @@ export const ChatbotDialog = () => {
           </ScrollArea>
 
           <div className="border-t">
-            <form onSubmit={handleFormSubmit} className="flex gap-2 p-4">
-              <Input
+            <form
+              onSubmit={handleFormSubmit}
+              className="flex flex-col gap-2 p-4"
+            >
+              <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Pergunte sobre suas finanças..."
@@ -226,15 +231,7 @@ export const ChatbotDialog = () => {
                 autoComplete="off"
               />
               <Button type="submit" disabled={isLoading || !input.trim()}>
-                <Send className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="border"
-                onClick={() => setIsOpen(false)}
-              >
-                Fechar
+                Enviar <Send className="h-4 w-4" />
               </Button>
             </form>
             <p className="px-4 pb-4 text-center text-xs text-muted-foreground">

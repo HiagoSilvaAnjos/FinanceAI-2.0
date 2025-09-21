@@ -48,7 +48,7 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
           <Link href="/transactions">Ver mais</Link>
         </Button>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 p-6">
         {lastTransactions.length > 0 ? (
           lastTransactions.map((transaction) => (
             <div
