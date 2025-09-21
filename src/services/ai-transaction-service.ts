@@ -9,8 +9,8 @@ interface ParsedTransaction {
   name: string;
   amount: number;
   type: "DEPOSIT" | "EXPENSE";
-  category: // Categorias para DESPESAS (EXPENSE)
-  | "HOUSING"
+  category:
+    | "HOUSING"
     | "TRANSPORTATION"
     | "FOOD"
     | "SHOPPING"
@@ -23,7 +23,6 @@ interface ParsedTransaction {
     | "INSURANCE"
     | "TAXES"
     | "LOAN_EXPENSE"
-    // Categorias para DEPÓSITOS (DEPOSIT)
     | "SALARY"
     | "FREELANCE"
     | "BUSINESS"
@@ -34,7 +33,6 @@ interface ParsedTransaction {
     | "RENTAL"
     | "SIDE_HUSTLE"
     | "LOAN_INCOME"
-    // Fallback
     | "OTHER";
   paymentMethod:
     | "CREDIT_CARD"
@@ -55,7 +53,42 @@ interface AIResponse {
   confidence: number;
 }
 
-// Lista de palavras/frases que podem indicar prompt injection
+// (Funções detectPromptInjection e sanitizeInput permanecem as mesmas)
+
+function detectPromptInjection(input: string): boolean {
+  const lowercaseInput = input.toLowerCase();
+  const hasSuspiciousPatterns = SUSPICIOUS_PATTERNS.some((pattern) =>
+    lowercaseInput.includes(pattern.toLowerCase()),
+  );
+  const hasSuspiciousStructure =
+    lowercaseInput.includes("</") ||
+    lowercaseInput.includes("<?") ||
+    lowercaseInput.includes("{{") ||
+    lowercaseInput.includes("${") ||
+    lowercaseInput.match(/\b(SELECT|INSERT|UPDATE|DELETE|DROP)\b/i) ||
+    lowercaseInput.includes("javascript:") ||
+    lowercaseInput.includes("data:") ||
+    lowercaseInput.match(/\b(eval|exec|system)\s*\(/i);
+  const hasSystemManipulation =
+    lowercaseInput.includes("ignore previous") ||
+    lowercaseInput.includes("forget everything") ||
+    lowercaseInput.includes("new instructions") ||
+    lowercaseInput.includes("system message") ||
+    lowercaseInput.includes("you must") ||
+    lowercaseInput.includes("override instructions");
+  return Boolean(
+    hasSuspiciousPatterns || hasSuspiciousStructure || hasSystemManipulation,
+  );
+}
+
+function sanitizeInput(input: string): string {
+  return input
+    .replace(/<[^>]*>/g, "")
+    .replace(/[{}$`]/g, "")
+    .trim()
+    .substring(0, 500);
+}
+
 const SUSPICIOUS_PATTERNS = [
   "ignore",
   "forget",
@@ -89,54 +122,20 @@ const SUSPICIOUS_PATTERNS = [
   "sql",
 ];
 
-// Função para detectar possível prompt injection
-function detectPromptInjection(input: string): boolean {
-  const lowercaseInput = input.toLowerCase();
-
-  // Verificar padrões suspeitos
-  const hasSuspiciousPatterns = SUSPICIOUS_PATTERNS.some((pattern) =>
-    lowercaseInput.includes(pattern.toLowerCase()),
-  );
-
-  // Verificar comandos ou estruturas suspeitas
-  const hasSuspiciousStructure =
-    lowercaseInput.includes("</") || // Tags HTML/XML
-    lowercaseInput.includes("<?") || // PHP/XML
-    lowercaseInput.includes("{{") || // Templates
-    lowercaseInput.includes("${") || // Template literals
-    lowercaseInput.match(/\b(SELECT|INSERT|UPDATE|DELETE|DROP)\b/i) || // SQL
-    lowercaseInput.includes("javascript:") ||
-    lowercaseInput.includes("data:") ||
-    lowercaseInput.match(/\b(eval|exec|system)\s*\(/i); // Funções perigosas
-
-  // Verificar tentativas de manipulação do sistema
-  const hasSystemManipulation =
-    lowercaseInput.includes("ignore previous") ||
-    lowercaseInput.includes("forget everything") ||
-    lowercaseInput.includes("new instructions") ||
-    lowercaseInput.includes("system message") ||
-    lowercaseInput.includes("you must") ||
-    lowercaseInput.includes("override instructions");
-
-  return Boolean(
-    hasSuspiciousPatterns || hasSuspiciousStructure || hasSystemManipulation,
-  );
-}
-
-// Função para sanitizar entrada
-function sanitizeInput(input: string): string {
-  return input
-    .replace(/<[^>]*>/g, "") // Remove HTML tags
-    .replace(/[{}$`]/g, "") // Remove caracteres especiais
-    .trim()
-    .substring(0, 500); // Limita tamanho
-}
-
 export async function parseTransactionWithAI(
   userInput: string,
 ): Promise<AIResponse> {
   try {
-    // Verificar prompt injection
+    const hoje = new Date();
+    const ontem = new Date();
+    ontem.setDate(hoje.getDate() - 1);
+    const amanha = new Date();
+    amanha.setDate(hoje.getDate() + 1);
+
+    const hojeFormatado = hoje.toISOString().split("T")[0];
+    const ontemFormatado = ontem.toISOString().split("T")[0];
+    const amanhaFormatado = amanha.toISOString().split("T")[0];
+
     if (detectPromptInjection(userInput)) {
       return {
         success: false,
@@ -146,7 +145,6 @@ export async function parseTransactionWithAI(
       };
     }
 
-    // Sanitizar entrada
     const sanitizedInput = sanitizeInput(userInput);
 
     if (sanitizedInput.length < 5) {
@@ -167,6 +165,12 @@ REGRAS IMPORTANTES:
 3. NÃO responda perguntas sobre outros temas
 4. Se não conseguir extrair uma transação válida, retorne um erro
 5. IMPORTANTE: As categorias são diferentes para DESPESAS e DEPÓSITOS
+
+REGRAS DE DATA:
+- Hoje é ${hojeFormatado}.
+- Se o usuário disser "ontem", use a data ${ontemFormatado}.
+- Se o usuário disser "amanhã", use a data ${amanhaFormatado}.
+- Se nenhuma data for especificada, use a data de hoje (${hojeFormatado}).
 
 FORMATO DE RESPOSTA (JSON):
 {
@@ -193,7 +197,7 @@ CATEGORIAS PARA DESPESAS (EXPENSE):
 - SHOPPING: Roupas, eletrônicos, celular, notebook, presentes, compras gerais, móveis
 - ENTERTAINMENT: Cinema, jogos, streaming, Netflix, viagens, lazer, festa, show, parque
 - HEALTH: Médico, farmácia, plano de saúde, academia, dentista, exames, hospital
-- UTILITY: Luz, água, internet, telefone, gás, contas básicas, TV a cabo
+- UTILITY: Luz, água, internet, telefone, gás, contas básicas, TV a cabo, conta de celular
 - EDUCATION: Curso, livro, escola, faculdade, material escolar, mensalidade
 - PETS: Veterinário, ração, petshop, medicamentos pet, brinquedos pet
 - BEAUTY: Salão, cosméticos, cuidados pessoais, barbeiro, manicure, spa
@@ -226,30 +230,18 @@ MÉTODOS DE PAGAMENTO:
 
 EXEMPLOS:
 Input: "Comprei um celular por R$ 2400 no cartão em 12x"
-Output: {"success": true, "transactions": [{"name": "Celular", "amount": 2400, "type": "EXPENSE", "category": "SHOPPING", "paymentMethod": "CREDIT_CARD", "date": "2025-01-19", "installments": 12}], "confidence": 95}
+Output: {"success": true, "transactions": [{"name": "Celular", "amount": 2400, "type": "EXPENSE", "category": "SHOPPING", "paymentMethod": "CREDIT_CARD", "date": "${hojeFormatado}", "installments": 12}], "confidence": 95}
 
-Input: "Comprei um carro por R$ 50000"
-Output: {"success": true, "transactions": [{"name": "Carro", "amount": 50000, "type": "EXPENSE", "category": "TRANSPORTATION", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
+Input: "Paguei R$ 200 da conta de luz ontem"
+Output: {"success": true, "transactions": [{"name": "Conta de luz", "amount": 200, "type": "EXPENSE", "category": "UTILITY", "paymentMethod": "BANK_SLIP", "date": "${ontemFormatado}", "installments": 1}], "confidence": 95}
 
-Input: "Paguei R$ 200 da conta de luz"
-Output: {"success": true, "transactions": [{"name": "Conta de luz", "amount": 200, "type": "EXPENSE", "category": "UTILITY", "paymentMethod": "BANK_SLIP", "date": "2025-01-19", "installments": 1}], "confidence": 95}
-
-Input: "Fiz um empréstimo de R$ 1000"
-Output: {"success": true, "transactions": [{"name": "Empréstimo recebido", "amount": 1000, "type": "DEPOSIT", "category": "LOAN_INCOME", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
-
-Input: "Recebi meu salário de 5000 reais"
-Output: {"success": true, "transactions": [{"name": "Salário", "amount": 5000, "type": "DEPOSIT", "category": "SALARY", "paymentMethod": "BANK_TRANSFER", "date": "2025-01-19", "installments": 1}], "confidence": 90}
-
-Input: "Paguei R$ 80 de combustível no posto"
-Output: {"success": true, "transactions": [{"name": "Combustível", "amount": 80, "type": "EXPENSE", "category": "TRANSPORTATION", "paymentMethod": "CASH", "date": "2025-01-19", "installments": 1}], "confidence": 85}
-
-Input: "Emprestei 500 reais para meu irmão"
-Output: {"success": true, "transactions": [{"name": "Empréstimo para irmão", "amount": 500, "type": "EXPENSE", "category": "LOAN_EXPENSE", "paymentMethod": "CASH", "date": "2025-01-19", "installments": 1}], "confidence": 90}
+Input: "Amanhã vou comprar um notebook por R$ 5000 à vista no cartão"
+Output: {"success": true, "transactions": [{"name": "Notebook", "amount": 5000, "type": "EXPENSE", "category": "SHOPPING", "paymentMethod": "DEBIT_CARD", "date": "${amanhaFormatado}", "installments": 1}], "confidence": 95}
 
 ENTRADA DO USUÁRIO:
 "${sanitizedInput}"
 
-Analise esta entrada e extraia as informações da transação. Use a data de hoje (${new Date().toISOString().split("T")[0]}) se não especificada. Responda APENAS com o JSON válido:`;
+Analise esta entrada e extraia as informações da transação. Responda APENAS com o JSON válido:`;
 
     const completion = await groq.chat.completions.create({
       messages: [
