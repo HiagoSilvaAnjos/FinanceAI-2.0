@@ -5,36 +5,22 @@ import { Suspense } from "react";
 import AddTransactionButton from "@/components/add-transaction-button";
 import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
-import { DataTable } from "@/components/ui/data-table";
 import { getUsageAndTransactionCount } from "@/data/get-ai-usage/get-ai-usage";
 import { getTransactions } from "@/data/get-transactions-data/get-transactions-data";
 import { auth } from "@/lib/auth";
 
-import { TransactionsTableSkeleton } from "./_components/data-table-skeleton";
-import { PaginationControls } from "./_components/transaction-pagination";
-import { transactionColumns } from "./columns";
+import TransactionsList from "./_components/transactions-list";
+import { TransactionsListSkeleton } from "./_components/transactions-list-skeleton";
 
-const TRANSACTIONS_PER_PAGE = 10;
-
-// Componente para buscar os dados da tabela
-async function TransactionsTable({ page }: { page: number }) {
+// Componente para buscar os dados das transações
+async function TransactionsData({ page }: { page: number }) {
   const { transactions, totalCount } = await getTransactions({
     page,
-    limit: TRANSACTIONS_PER_PAGE,
+    limit: 50, // Aumentar o limit para buscar mais transações
   });
 
-  const hasNextPage = page * TRANSACTIONS_PER_PAGE < totalCount;
-  const hasPrevPage = page > 1;
-
   return (
-    <DataTable columns={transactionColumns} data={transactions}>
-      <PaginationControls
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        totalCount={totalCount}
-        perPage={TRANSACTIONS_PER_PAGE}
-      />
-    </DataTable>
+    <TransactionsList transactions={transactions} totalCount={totalCount} />
   );
 }
 
@@ -82,8 +68,8 @@ const TransactionsPage = async ({ searchParams }: TransactionsPageProps) => {
           </div>
         </div>
         <div className="mt-4">
-          <Suspense fallback={<TransactionsTableSkeleton />}>
-            <TransactionsTable page={page} />
+          <Suspense fallback={<TransactionsListSkeleton />}>
+            <TransactionsData page={page} />
           </Suspense>
         </div>
       </div>

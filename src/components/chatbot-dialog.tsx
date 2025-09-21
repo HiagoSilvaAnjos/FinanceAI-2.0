@@ -112,10 +112,10 @@ export const ChatbotDialog = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-110"
+        className="fixed bottom-12 right-5 z-50 h-14 w-14 rounded-full bg-primary text-white shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
         aria-label="Abrir chat do assistente"
       >
-        <MessageSquare className="h-6 w-6" />
+        <MessageSquare />
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
