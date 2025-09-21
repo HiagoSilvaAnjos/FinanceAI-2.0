@@ -36,7 +36,8 @@ const TimeSelect = ({ selectedMonth, selectedYear }: TimeSelectProps) => {
   const generateYearOptions = () => {
     const currentYear = new Date().getFullYear();
     const years = [];
-    for (let year = currentYear; year >= 2024; year--) {
+    const maxYear = Math.max(currentYear + 2, 2026);
+    for (let year = maxYear; year >= 2024; year--) {
       years.push({ value: String(year), label: String(year) });
     }
     return years;

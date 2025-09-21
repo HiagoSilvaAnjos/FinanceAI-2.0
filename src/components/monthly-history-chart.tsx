@@ -45,7 +45,7 @@ const MonthlyHistoryChart = ({
     if (active && payload && payload.length) {
       return (
         <div className="rounded-lg border border-gray-300 bg-background p-3 shadow-lg dark:border-gray-600">
-          <p className="mb-2 font-medium text-gray-900 dark:text-white">{`${label} ${selectedYear}`}</p>
+          <p className="mb-2 font-medium text-gray-900 dark:text-white">{`${label} de ${selectedYear}`}</p>
           {payload.map((entry: any, index: number) => (
             <p
               key={index}
@@ -67,6 +67,9 @@ const MonthlyHistoryChart = ({
         <CardTitle className="text-lg font-semibold">
           Histórico de Receitas e Despesas - {selectedYear}
         </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Visualização mensal dos seus dados financeiros
+        </p>
       </CardHeader>
       <CardContent className="w-full overflow-x-auto">
         <ResponsiveContainer width="100%" minWidth={800} height={350}>

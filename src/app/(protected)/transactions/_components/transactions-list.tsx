@@ -154,6 +154,7 @@ interface FilterSheetProps {
     category: string;
     paymentMethod: string;
     month: string;
+    year: string;
   };
   setFilters: (filters: any) => void;
 }
@@ -164,6 +165,19 @@ function FilterSheet({
   filters,
   setFilters,
 }: FilterSheetProps) {
+  // Gerar opções de anos (2024 até 2026 ou ano atual + 2)
+  const generateYearOptions = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    const maxYear = Math.max(currentYear + 2, 2026);
+    for (let year = maxYear; year >= 2024; year--) {
+      years.push({ value: String(year), label: String(year) });
+    }
+    return years;
+  };
+
+  const yearOptions = generateYearOptions();
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md">
@@ -253,6 +267,26 @@ function FilterSheet({
           </div>
 
           <div>
+            <label className="mb-2 block text-sm font-medium">Ano</label>
+            <Select
+              value={filters.year}
+              onValueChange={(value) => setFilters({ ...filters, year: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Todos os anos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {yearOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <label className="mb-2 block text-sm font-medium">Mês</label>
             <Select
               value={filters.month}
@@ -289,6 +323,7 @@ function FilterSheet({
                 category: "all",
                 paymentMethod: "all",
                 month: "all",
+                year: "all",
               })
             }
             variant="outline"
@@ -319,6 +354,7 @@ export default function TransactionsList({
     category: "all",
     paymentMethod: "all",
     month: "all",
+    year: "all",
   });
 
   // Agrupar transações por data
@@ -348,6 +384,14 @@ export default function TransactionsList({
       filteredTransactions = filteredTransactions.filter(
         (t) => t.paymentMethod === filters.paymentMethod,
       );
+    }
+
+    if (filters.year !== "all") {
+      filteredTransactions = filteredTransactions.filter((t) => {
+        const transactionDate = new Date(t.date);
+        const year = String(transactionDate.getFullYear());
+        return year === filters.year;
+      });
     }
 
     if (filters.month !== "all") {
@@ -396,10 +440,12 @@ export default function TransactionsList({
     } else if (date.toDateString() === yesterday.toDateString()) {
       return "Ontem";
     } else {
+      // Formato completo com ano: "domingo, 18 de janeiro de 2026"
       return date.toLocaleDateString("pt-BR", {
         weekday: "long",
         day: "numeric",
         month: "long",
+        year: "numeric",
         timeZone: "UTC",
       });
     }

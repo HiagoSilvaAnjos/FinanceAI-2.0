@@ -40,6 +40,45 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
     return "-";
   };
 
+  const formatTransactionDate = (date: Date) => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const transactionDate = new Date(date);
+
+    // Se for hoje
+    if (transactionDate.toDateString() === today.toDateString()) {
+      return "Hoje";
+    }
+
+    // Se for ontem
+    if (transactionDate.toDateString() === yesterday.toDateString()) {
+      return "Ontem";
+    }
+
+    // Verificar se é do ano atual
+    const currentYear = today.getFullYear();
+    const transactionYear = transactionDate.getFullYear();
+
+    if (transactionYear === currentYear) {
+      // Ano atual - mostrar sem o ano
+      return transactionDate.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        timeZone: "UTC",
+      });
+    } else {
+      // Ano diferente - mostrar com o ano
+      return transactionDate.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+    }
+  };
+
   return (
     <ScrollArea className="max-h-[900px] rounded-md border">
       <CardHeader className="mb-2 mt-4 flex items-center justify-between">
@@ -67,12 +106,7 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
                 <div>
                   <p className="text-sm font-bold">{transaction.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(transaction.date).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      timeZone: "UTC",
-                    })}
+                    {formatTransactionDate(transaction.date)}
                   </p>
                 </div>
               </div>
