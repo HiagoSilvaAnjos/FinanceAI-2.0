@@ -68,8 +68,8 @@ const MonthlyHistoryChart = ({
           Histórico de Receitas e Despesas - {selectedYear}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
+      <CardContent className="w-full overflow-x-auto">
+        <ResponsiveContainer width="100%" minWidth={800} height={350}>
           <BarChart
             data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -91,18 +91,21 @@ const MonthlyHistoryChart = ({
               fill="#55B02E"
               name="Receitas"
               radius={[2, 2, 0, 0]}
+              barSize={20}
             />
             <Bar
               dataKey="Despesas"
               fill="#E93030"
               name="Despesas"
               radius={[2, 2, 0, 0]}
+              barSize={20}
             />
             <Bar
               dataKey="Saldo"
               fill="#3B82F6"
               name="Saldo"
               radius={[2, 2, 0, 0]}
+              barSize={20}
             />
           </BarChart>
         </ResponsiveContainer>
