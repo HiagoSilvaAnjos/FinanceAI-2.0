@@ -56,7 +56,8 @@ function TransactionCard({ transaction }: TransactionCardProps) {
 
   return (
     <Card className="p-4 transition-shadow hover:shadow-md">
-      <div className="flex items-center justify-between">
+      {/* Layout para telas grandes (md e acima) */}
+      <div className="hidden md:flex md:items-center md:justify-between">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg dark:bg-gray-800">
             <Image
@@ -91,8 +92,53 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           </div>
 
           <EditTransactionButton transaction={transaction} />
-
           <DeleteTransactionButton transactionId={transaction.id} />
+        </div>
+      </div>
+
+      {/* Layout para telas pequenas (mobile) */}
+      <div className="block md:hidden">
+        <div className="space-y-3">
+          {/* Primeira linha: Ícone e informações principais */}
+          <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+              <Image
+                src={`/${TRANSACTION_PAYMENT_METHOD_ICONS[transaction.paymentMethod]}`}
+                height={24}
+                width={24}
+                alt={transaction.paymentMethod}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-medium leading-tight">
+                {transaction.name}
+              </h3>
+              <div className="mt-1">
+                <Badge variant="outline" className="text-xs">
+                  {TRANSACTION_CATEGORY_LABELS[transaction.category]}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Segunda linha: Método de pagamento e valor */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">
+              {TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod]}
+            </span>
+            <p
+              className={`font-semibold ${isPositive ? "text-green-600" : "text-red-600"}`}
+            >
+              {isPositive ? "+" : ""}
+              {formattedAmount}
+            </p>
+          </div>
+
+          {/* Terceira linha: Botões de ação */}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <EditTransactionButton transaction={transaction} />
+            <DeleteTransactionButton transactionId={transaction.id} />
+          </div>
         </div>
       </div>
     </Card>

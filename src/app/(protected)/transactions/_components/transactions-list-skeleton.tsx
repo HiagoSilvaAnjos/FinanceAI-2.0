@@ -20,7 +20,8 @@ export function TransactionsListSkeleton() {
           <div className="space-y-2">
             {Array.from({ length: 3 }).map((_, i) => (
               <Card key={i} className="p-4">
-                <div className="flex items-center justify-between">
+                {/* Layout para desktop */}
+                <div className="hidden md:flex md:items-center md:justify-between">
                   <div className="flex flex-1 items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
                     <div className="flex-1 space-y-2">
@@ -34,6 +35,33 @@ export function TransactionsListSkeleton() {
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-5 w-20 bg-white/10" />
                     <Skeleton className="h-8 w-8 bg-white/10" />
+                    <Skeleton className="h-8 w-8 bg-white/10" />
+                  </div>
+                </div>
+
+                {/* Layout para mobile */}
+                <div className="block md:hidden">
+                  <div className="space-y-3">
+                    {/* Primeira linha */}
+                    <div className="flex items-start gap-3">
+                      <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32 bg-white/10" />
+                        <Skeleton className="h-5 w-20 rounded bg-white/10" />
+                      </div>
+                    </div>
+
+                    {/* Segunda linha */}
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-3 w-16 bg-white/10" />
+                      <Skeleton className="h-5 w-20 bg-white/10" />
+                    </div>
+
+                    {/* Terceira linha */}
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <Skeleton className="h-8 w-8 bg-white/10" />
+                      <Skeleton className="h-8 w-8 bg-white/10" />
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -47,7 +75,8 @@ export function TransactionsListSkeleton() {
           <div className="space-y-2">
             {Array.from({ length: 2 }).map((_, i) => (
               <Card key={i} className="p-4">
-                <div className="flex items-center justify-between">
+                {/* Layout para desktop */}
+                <div className="hidden md:flex md:items-center md:justify-between">
                   <div className="flex flex-1 items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
                     <div className="flex-1 space-y-2">
@@ -61,6 +90,33 @@ export function TransactionsListSkeleton() {
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-5 w-24 bg-white/10" />
                     <Skeleton className="h-8 w-8 bg-white/10" />
+                    <Skeleton className="h-8 w-8 bg-white/10" />
+                  </div>
+                </div>
+
+                {/* Layout para mobile */}
+                <div className="block md:hidden">
+                  <div className="space-y-3">
+                    {/* Primeira linha */}
+                    <div className="flex items-start gap-3">
+                      <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-40 bg-white/10" />
+                        <Skeleton className="h-5 w-24 rounded bg-white/10" />
+                      </div>
+                    </div>
+
+                    {/* Segunda linha */}
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-3 w-12 bg-white/10" />
+                      <Skeleton className="h-5 w-24 bg-white/10" />
+                    </div>
+
+                    {/* Terceira linha */}
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <Skeleton className="h-8 w-8 bg-white/10" />
+                      <Skeleton className="h-8 w-8 bg-white/10" />
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -74,7 +130,8 @@ export function TransactionsListSkeleton() {
           <div className="space-y-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <Card key={i} className="p-4">
-                <div className="flex items-center justify-between">
+                {/* Layout para desktop */}
+                <div className="hidden md:flex md:items-center md:justify-between">
                   <div className="flex flex-1 items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-full bg-white/10" />
                     <div className="flex-1 space-y-2">
@@ -88,6 +145,33 @@ export function TransactionsListSkeleton() {
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-5 w-20 bg-white/10" />
                     <Skeleton className="h-8 w-8 bg-white/10" />
+                    <Skeleton className="h-8 w-8 bg-white/10" />
+                  </div>
+                </div>
+
+                {/* Layout para mobile */}
+                <div className="block md:hidden">
+                  <div className="space-y-3">
+                    {/* Primeira linha */}
+                    <div className="flex items-start gap-3">
+                      <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-36 bg-white/10" />
+                        <Skeleton className="h-5 w-20 rounded bg-white/10" />
+                      </div>
+                    </div>
+
+                    {/* Segunda linha */}
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-3 w-14 bg-white/10" />
+                      <Skeleton className="h-5 w-20 bg-white/10" />
+                    </div>
+
+                    {/* Terceira linha */}
+                    <div className="flex items-center justify-end gap-2 pt-1">
+                      <Skeleton className="h-8 w-8 bg-white/10" />
+                      <Skeleton className="h-8 w-8 bg-white/10" />
+                    </div>
                   </div>
                 </div>
               </Card>
