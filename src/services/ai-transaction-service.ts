@@ -203,7 +203,7 @@ CATEGORIAS PARA DESPESAS (EXPENSE):
 - BEAUTY: Salão, cosméticos, cuidados pessoais, barbeiro, manicure, spa
 - INSURANCE: Seguro carro, casa, vida, saúde, seguros em geral
 - TAXES: Impostos, IPTU, taxas bancárias, multas, contas oficiais
-- LOAN_EXPENSE: Dinheiro emprestado para alguém, empréstimos dados
+- LOAN_EXPENSE: Emprestei dinheiro para alguém, empréstimos que eu dei
 - OTHER: Outros gastos que não se encaixam nas categorias acima
 
 CATEGORIAS PARA RECEITAS/DEPÓSITOS (DEPOSIT):
@@ -221,10 +221,10 @@ CATEGORIAS PARA RECEITAS/DEPÓSITOS (DEPOSIT):
 
 MÉTODOS DE PAGAMENTO:
 - CREDIT_CARD: Cartão de crédito, parcelado
-- DEBIT_CARD: Cartão de débito
+- DEBIT_CARD: Cartão de débito, á vista no cartão
 - CASH: Dinheiro, à vista
 - PIX: PIX, transferência instantânea
-- BANK_TRANSFER: Transferência bancária, TED, DOC
+- BANK_TRANSFER: Transferência bancária, TED, DOC, Salário
 - BANK_SLIP: Boleto bancário
 - OTHER: Outros métodos
 
@@ -238,10 +238,11 @@ Output: {"success": true, "transactions": [{"name": "Conta de luz", "amount": 20
 Input: "Amanhã vou comprar um notebook por R$ 5000 à vista no cartão"
 Output: {"success": true, "transactions": [{"name": "Notebook", "amount": 5000, "type": "EXPENSE", "category": "SHOPPING", "paymentMethod": "DEBIT_CARD", "date": "${amanhaFormatado}", "installments": 1}], "confidence": 95}
 
-ENTRADA DO USUÁRIO:
-"${sanitizedInput}"
+Input: "Emprestei 100 reais para um amigo"
+Output: {"success": true, "transactions": [{"name": "Empréstimo para amigo", "amount": 100, "type": "EXPENSE", "category": "LOAN_EXPENSE", "paymentMethod": "OTHER", "date": "${hojeFormatado}", "installments": 1}], "confidence": 98}
 
-Analise esta entrada e extraia as informações da transação. Responda APENAS com o JSON válido:`;
+ENTRADA DO USUÁRIO:
+"${sanitizedInput}"`;
 
     const completion = await groq.chat.completions.create({
       messages: [
@@ -256,11 +257,13 @@ Analise esta entrada e extraia as informações da transação. Responda APENAS 
         },
       ],
       model: "llama-3.1-8b-instant",
-      temperature: 0.1,
+      temperature: 0.7,
       max_tokens: 1000,
     });
 
     const aiResponse = completion.choices[0]?.message?.content?.trim();
+
+    console.log("IA respondeu:", aiResponse);
 
     if (!aiResponse) {
       return {

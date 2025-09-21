@@ -354,6 +354,7 @@ export default function TransactionsList({
         weekday: "long",
         day: "numeric",
         month: "long",
+        timeZone: "UTC",
       });
     }
   };
