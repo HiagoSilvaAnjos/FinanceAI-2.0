@@ -153,16 +153,25 @@ const UpsertTransactionDialog = ({
       ) {
         toast.success(
           `${data.installments} transações criadas com sucesso (parcelado).`,
+          {
+            position: "top-left",
+          },
         );
       } else {
         toast.success(
           `Transação ${isUpdate ? "editada" : "adicionada"} com sucesso.`,
+          {
+            position: "top-left",
+          },
         );
       }
     } catch (error) {
       console.log(error);
       toast.error(
         "Ocorreu um erro ao tentar salvar a transação. Tente novamente.",
+        {
+          position: "top-left",
+        },
       );
     }
   };
@@ -171,8 +180,6 @@ const UpsertTransactionDialog = ({
 
   // Obter categorias baseadas no tipo selecionado
   const availableCategories = getCategoriesByType(transactionType);
-
-  // Modifique o DialogContent no arquivo src/components/upsert-transaction-dialog.tsx
 
   return (
     <Dialog

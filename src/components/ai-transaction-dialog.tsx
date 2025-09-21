@@ -51,7 +51,9 @@ const AITransactionDialog = ({
 
   const handleSubmit = async () => {
     if (!userInput.trim()) {
-      toast.error("Por favor, descreva uma transação");
+      toast.error("Por favor, descreva uma transação", {
+        position: "top-left",
+      });
       return;
     }
 
@@ -67,23 +69,27 @@ const AITransactionDialog = ({
         setQuotaExceeded(true);
         toast.error("Limite diário atingido", {
           description: `Você pode usar novamente em ${response.quotaInfo?.timeUntilReset}`,
+          position: "top-left",
         });
       } else if (response.success) {
         toast.success(
           `${response.createdTransactions} transação(ões) criada(s) com sucesso!`,
           {
             description: `Total: R$ ${response.totalAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
+            position: "top-left",
           },
         );
       } else {
         toast.error("Erro ao processar transação", {
           description: response.error,
+          position: "top-left",
         });
       }
     } catch (error) {
       console.error("Erro:", error);
       toast.error("Erro interno", {
         description: "Tente novamente em alguns momentos",
+        position: "top-left",
       });
       setResult({
         success: false,

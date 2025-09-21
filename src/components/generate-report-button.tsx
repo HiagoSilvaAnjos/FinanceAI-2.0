@@ -54,6 +54,7 @@ const GenerateReportButton = ({
       toast.error("Nenhuma transação encontrada", {
         description:
           "Adicione pelo menos uma transação para gerar um relatório.",
+        position: "top-left",
       });
       return;
     }
@@ -63,6 +64,7 @@ const GenerateReportButton = ({
     try {
       toast.info("Gerando relatório com IA...", {
         description: "Isso pode levar alguns segundos",
+        position: "top-left",
       });
 
       const result = await generateReport(month, year);
@@ -72,20 +74,25 @@ const GenerateReportButton = ({
         setShowQuotaDialog(true);
         toast.error("Limite mensal de relatórios atingido", {
           description: `Você pode gerar novamente em ${result.quotaInfo?.timeUntilReset}`,
+          position: "top-left",
         });
       } else if (result.success) {
         setReportData(result);
         setShowReportModal(true);
-        toast.success("Relatório gerado com sucesso!");
+        toast.success("Relatório gerado com sucesso!", {
+          position: "top-left",
+        });
       } else {
         toast.error("Erro ao gerar relatório", {
           description: result.error || "Tente novamente em alguns momentos",
+          position: "top-left",
         });
       }
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
       toast.error("Erro ao gerar relatório", {
         description: "Tente novamente em alguns momentos",
+        position: "top-left",
       });
     } finally {
       setIsGenerating(false);
@@ -96,9 +103,13 @@ const GenerateReportButton = ({
     if (reportData?.content) {
       try {
         await navigator.clipboard.writeText(reportData.content);
-        toast.success("Relatório copiado para área de transferência!");
+        toast.success("Relatório copiado para área de transferência!", {
+          position: "top-left",
+        });
       } catch (error) {
-        toast.error("Erro ao copiar relatório");
+        toast.error("Erro ao copiar relatório", {
+          position: "top-left",
+        });
       }
     }
   };
@@ -108,15 +119,21 @@ const GenerateReportButton = ({
     if (!reportData) return;
 
     try {
-      toast.info("Gerando PDF...", { description: "Preparando documento..." });
+      toast.info("Gerando PDF...", {
+        description: "Preparando documento...",
+        position: "top-left",
+      });
 
       await generateAndDownloadPDF(reportData);
 
-      toast.success("PDF baixado com sucesso!");
+      toast.success("PDF baixado com sucesso!", {
+        position: "top-left",
+      });
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
       toast.error("Erro ao gerar PDF", {
         description: "Tente novamente em alguns momentos",
+        position: "top-left",
       });
     }
   };

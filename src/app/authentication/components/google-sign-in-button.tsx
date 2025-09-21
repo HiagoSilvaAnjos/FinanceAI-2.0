@@ -20,11 +20,13 @@ const GoogleSignInButton = () => {
       });
 
       toast.success("Selecione uma conta!", {
-        position: "bottom-left",
+        position: "top-left",
       });
     } catch (error) {
       console.error("Erro no login:", error);
-      toast.error("Erro ao fazer login com Google. Tente novamente.");
+      toast.error("Erro ao fazer login com Google. Tente novamente.", {
+        position: "top-left",
+      });
     } finally {
       setIsGoogleLoading(false);
     }
