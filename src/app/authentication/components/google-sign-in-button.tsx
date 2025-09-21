@@ -19,7 +19,7 @@ const GoogleSignInButton = () => {
         callbackURL: "/",
       });
 
-      toast.success("Login realizado com sucesso!", {
+      toast.success("Selecione uma conta!", {
         position: "bottom-left",
       });
     } catch (error) {
@@ -33,7 +33,7 @@ const GoogleSignInButton = () => {
   return (
     <Button
       variant="outline"
-      className="w-full cursor-pointer"
+      className="w-full cursor-pointer bg-white font-semibold text-black"
       onClick={handleSignInWithGoogle}
       type="button"
       disabled={isGoogleLoading}
@@ -42,7 +42,7 @@ const GoogleSignInButton = () => {
         <LoaderCircleIcon className="animate-spin" />
       ) : (
         <>
-          <svg viewBox="0 0 24 24" className="h-4 w-4">
+          <svg viewBox="0 0 24 24" className="h-10 w-10">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"

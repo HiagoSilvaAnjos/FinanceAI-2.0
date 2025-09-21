@@ -142,7 +142,7 @@ export const ChatbotDialog = () => {
                   <div className="flex max-w-[85%] flex-col items-start">
                     <p
                       className={cn(
-                        "mb-1 text-xs text-muted-foreground",
+                        "mb-1 text-sm text-black dark:text-white",
                         msg.sender === "user" && "self-end",
                       )}
                     >
@@ -152,7 +152,7 @@ export const ChatbotDialog = () => {
                     </p>
                     <div
                       className={cn(
-                        "break-words rounded-lg px-4 py-2 text-sm",
+                        "break-words rounded-lg px-4 py-2 text-xs md:text-sm",
                         msg.sender === "bot"
                           ? "bg-muted"
                           : "bg-primary text-primary-foreground",
@@ -207,7 +207,7 @@ export const ChatbotDialog = () => {
                       key={s}
                       variant="outline"
                       size="sm"
-                      className="w-fit px-2 py-1 text-xs md:w-auto"
+                      className="w-fit px-2 py-1 text-xs md:w-auto md:text-sm"
                       onClick={() => sendMessage(s)}
                     >
                       {s}
@@ -234,7 +234,7 @@ export const ChatbotDialog = () => {
                 Enviar <Send className="h-4 w-4" />
               </Button>
             </form>
-            <p className="px-4 pb-4 text-center text-xs text-muted-foreground">
+            <p className="px-4 pb-4 text-center text-xs text-black dark:text-white md:text-sm">
               A IA pode cometer erros. Considere verificar as informações
               importantes.
             </p>

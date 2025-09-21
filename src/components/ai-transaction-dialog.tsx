@@ -123,7 +123,7 @@ const AITransactionDialog = ({
               <Sparkles className="h-5 w-5" />
               Criar Transação com IA
             </DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogDescription className="text-base text-black dark:text-white">
               {quotaExceeded
                 ? "Limite diário de uso atingido. Tente novamente amanhã."
                 : "Descreva sua transação em linguagem natural e nossa IA criará automaticamente para você."}
@@ -145,7 +145,7 @@ const AITransactionDialog = ({
                   <h3 className="text-lg font-semibold">
                     Limite Diário Atingido
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-black dark:text-white">
                     Você já utilizou todas as {result?.quotaInfo?.limit}{" "}
                     transações com IA hoje.
                   </p>
@@ -160,14 +160,14 @@ const AITransactionDialog = ({
                         <strong>{result.quotaInfo.timeUntilReset}</strong>
                       </span>
                     </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
+                    <div className="mt-1 text-sm text-black dark:text-white">
                       Uso atual: {result.quotaInfo.currentUsage}/
                       {result.quotaInfo.limit}
                     </div>
                   </div>
                 )}
 
-                <div className="text-sm dark:text-white">
+                <div className="text-sm text-black dark:text-white">
                   Você ainda pode adicionar transações manualmente pelo botão{" "}
                   <span className="font-semibold text-green-500">
                     Adicionar Transação
@@ -180,7 +180,9 @@ const AITransactionDialog = ({
             <div className="space-y-6">
               {/* Input de texto */}
               <div className="space-y-2">
-                <label className="text-sm">Descreva sua transação:</label>
+                <label className="text-sm text-black dark:text-white">
+                  Descreva sua transação:
+                </label>
                 <Textarea
                   placeholder="Ex: Comprei um notebook por R$ 3.500 no cartão parcelado em 10x"
                   value={userInput}
@@ -189,7 +191,7 @@ const AITransactionDialog = ({
                   disabled={isProcessing}
                   maxLength={500}
                 />
-                <div className="flex justify-between text-xs dark:text-white">
+                <div className="flex justify-between text-sm text-black dark:text-white">
                   <span>Use linguagem natural - a IA entenderá!</span>
                   <span>{userInput.length}/500</span>
                 </div>
@@ -205,7 +207,7 @@ const AITransactionDialog = ({
                     <Badge
                       key={index}
                       variant="outline"
-                      className="cursor-pointer p-2 text-xs font-normal hover:bg-muted"
+                      className="cursor-pointer p-2 text-sm font-normal hover:bg-muted"
                       onClick={() => setUserInput(example)}
                     >
                       {example}
@@ -275,7 +277,7 @@ const AITransactionDialog = ({
                                 </span>
                               </div>
                               {t.installments && t.installments > 1 && (
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-sm text-black dark:text-white">
                                   Parcelado em {t.installments}x
                                 </p>
                               )}

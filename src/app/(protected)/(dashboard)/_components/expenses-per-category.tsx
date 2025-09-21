@@ -17,7 +17,7 @@ const ExpensesPerCategory = ({
   return (
     <ScrollArea className="col-span-2 h-full max-h-[500px] rounded-md border pb-6">
       <CardHeader className="mb-4 mt-4">
-        <CardTitle className="font-semibold">
+        <CardTitle className="text-base font-semibold md:text-xl">
           Seus gastos por categoria
         </CardTitle>
       </CardHeader>
@@ -35,14 +35,14 @@ const ExpensesPerCategory = ({
                 </div>
               </div>
               <Progress value={category.percentageOfTotal} />
-              <p className="text-muted-foreground">
+              <p className="text-black dark:text-white">
                 Total: {formatCurrency(category.totalAmount)}
               </p>
             </div>
           ))
         ) : (
           <div className="flex h-32 items-center justify-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-black dark:text-white">
               Nenhuma despesa encontrada para este período
             </p>
           </div>

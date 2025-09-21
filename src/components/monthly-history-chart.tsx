@@ -67,7 +67,7 @@ const MonthlyHistoryChart = ({
         <CardTitle className="text-lg font-semibold">
           Histórico de Receitas e Despesas - {selectedYear}
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-black dark:text-white">
           Visualização mensal dos seus dados financeiros
         </p>
       </CardHeader>
@@ -94,21 +94,21 @@ const MonthlyHistoryChart = ({
               fill="#55B02E"
               name="Receitas"
               radius={[2, 2, 0, 0]}
-              barSize={20}
+              barSize={30}
             />
             <Bar
               dataKey="Despesas"
               fill="#E93030"
               name="Despesas"
               radius={[2, 2, 0, 0]}
-              barSize={20}
+              barSize={30}
             />
             <Bar
               dataKey="Saldo"
               fill="#3B82F6"
               name="Saldo"
               radius={[2, 2, 0, 0]}
-              barSize={20}
+              barSize={30}
             />
           </BarChart>
         </ResponsiveContainer>

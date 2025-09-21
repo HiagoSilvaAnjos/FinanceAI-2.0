@@ -42,7 +42,7 @@ export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
               <BrainCircuit className="h-5 w-5" />
               Seu Uso de Inteligência Artificial
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-black dark:text-white">
               Acompanhe seus limites de uso para as funcionalidades com IA. Os
               limites são reiniciados periodicamente.
             </DialogDescription>
@@ -67,7 +67,7 @@ export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
                   (transactionUsage.currentUsage / transactionUsage.limit) * 100
                 }
               />
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center justify-between text-sm text-black dark:text-white">
                 <span>
                   Uso: {transactionUsage.currentUsage} /{" "}
                   {transactionUsage.limit}
@@ -92,7 +92,7 @@ export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
               <Progress
                 value={(reportUsage.currentUsage / reportUsage.limit) * 100}
               />
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center justify-between text-sm text-black dark:text-white">
                 <span>
                   Uso: {reportUsage.currentUsage} / {reportUsage.limit}
                 </span>
@@ -119,7 +119,7 @@ export const AIUsageDialog = ({ children, usage }: AIUsageDialogProps) => {
               <Progress
                 value={(chatUsage.currentUsage / chatUsage.limit) * 100}
               />
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <div className="flex items-center justify-between text-sm text-black dark:text-white">
                 <span>
                   Uso: {chatUsage.currentUsage} / {chatUsage.limit}
                 </span>

@@ -71,17 +71,17 @@ function TransactionCard({ transaction }: TransactionCardProps) {
           <div className="min-w-0 flex-1">
             <h3 className="truncate text-sm font-medium">{transaction.name}</h3>
             <div className="mt-1 flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-sm">
                 {TRANSACTION_CATEGORY_LABELS[transaction.category]}
               </Badge>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-black dark:text-white">
                 {TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod]}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-6">
           <div className="text-right">
             <p
               className={`font-semibold ${isPositive ? "text-green-600" : "text-red-600"}`}
@@ -91,8 +91,10 @@ function TransactionCard({ transaction }: TransactionCardProps) {
             </p>
           </div>
 
-          <EditTransactionButton transaction={transaction} />
-          <DeleteTransactionButton transactionId={transaction.id} />
+          <div className="flex items-center gap-2">
+            <EditTransactionButton transaction={transaction} />
+            <DeleteTransactionButton transactionId={transaction.id} />
+          </div>
         </div>
       </div>
 
@@ -114,7 +116,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
                 {transaction.name}
               </h3>
               <div className="mt-1">
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-sm">
                   {TRANSACTION_CATEGORY_LABELS[transaction.category]}
                 </Badge>
               </div>
@@ -123,7 +125,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
 
           {/* Segunda linha: Método de pagamento e valor */}
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm text-black dark:text-white">
               {TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod]}
             </span>
             <p
@@ -479,12 +481,12 @@ export default function TransactionsList({
       <div className="sticky top-0 z-10 space-y-4 border-b bg-background p-4">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-black dark:text-white" />
             <Input
               placeholder="Buscar transações..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 text-black placeholder:text-black dark:text-white dark:placeholder:text-white"
             />
           </div>
           <Button
@@ -505,11 +507,11 @@ export default function TransactionsList({
       <div className="flex-1 overflow-y-auto">
         {groupedTransactions.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center p-4 text-center">
-            <DollarSign className="mb-4 h-12 w-12 text-muted-foreground" />
+            <DollarSign className="mb-4 h-12 w-12 text-black dark:text-white" />
             <h3 className="mb-2 text-lg font-medium">
               Nenhuma transação encontrada
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-black dark:text-white">
               {searchQuery || hasActiveFilters
                 ? "Tente ajustar os filtros ou termo de busca."
                 : "Crie sua primeira transação para começar."}
@@ -520,7 +522,7 @@ export default function TransactionsList({
             {groupedTransactions.map(
               ({ date, transactions: transactionList }) => (
                 <div key={date.toDateString()}>
-                  <h2 className="sticky top-0 mb-3 bg-background py-2 text-sm font-medium text-muted-foreground">
+                  <h2 className="sticky top-0 mb-3 bg-background py-2 text-sm font-medium text-black dark:text-white">
                     {formatDateHeader(date)}
                   </h2>
                   <div className="space-y-2">

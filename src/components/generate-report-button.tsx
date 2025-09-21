@@ -122,8 +122,8 @@ const GenerateReportButton = ({
   };
 
   const buttonClass = hasQuota
-    ? "bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800"
-    : "bg-gradient-to-r from-red-500 to-red-700 text-white hover:from-red-600 hover:to-red-800";
+    ? "bg-gradient-to-r from-green-500 to-green-700 text-white transition duration-300 ease-linear hover:from-green-600 hover:to-green-800 hover:text-white"
+    : "bg-gradient-to-r from-red-500 to-red-700 text-white transition duration-300 ease-linear hover:from-red-600 hover:to-red-800 hover:text-white";
 
   return (
     <>
@@ -138,8 +138,8 @@ const GenerateReportButton = ({
         ) : (
           <FileText className="h-4 w-4" />
         )}
-        {isGenerating ? "Gerando..." : "Gerar Relatório com IA"}
-        <Sparkles className="h-4 w-4" />
+        {isGenerating ? "Gerando..." : "Relatório com IA"}
+        <Sparkles className="h-6 w-6" />
       </Button>
 
       {/* Modal de Quota Excedida */}
@@ -151,7 +151,7 @@ const GenerateReportButton = ({
                 <AlertTriangle className="h-5 w-5 text-orange-500" />
                 Limite Mensal Atingido
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-black dark:text-white">
                 Você já utilizou todos os relatórios com IA deste mês.
               </DialogDescription>
             </DialogHeader>
@@ -167,7 +167,7 @@ const GenerateReportButton = ({
                       Resetará em: <strong>{quotaInfo?.timeUntilReset}</strong>
                     </span>
                   </div>
-                  <div className="mt-1 text-center text-xs text-muted-foreground">
+                  <div className="mt-1 text-center text-sm text-black dark:text-white">
                     Uso atual: {quotaInfo?.currentUsage}/{quotaInfo?.limit}{" "}
                     relatórios
                   </div>
@@ -199,7 +199,7 @@ const GenerateReportButton = ({
                 <FileText className="h-5 w-5" />
                 Relatório Financeiro - {reportData?.userData?.period}
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-black dark:text-white">
                 Análise inteligente das suas finanças gerada por IA
               </DialogDescription>
             </DialogHeader>

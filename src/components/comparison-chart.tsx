@@ -83,7 +83,7 @@ const ComparisonChart = ({ data }: ComparisonChartProps) => {
           <CardTitle className="text-lg font-semibold">
             Comparação Mensal
           </CardTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-black dark:text-white">
             {data.previousMonth.month} vs {data.currentMonth.month}
           </p>
         </CardHeader>

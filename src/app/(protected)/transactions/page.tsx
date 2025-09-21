@@ -16,7 +16,7 @@ import { TransactionsListSkeleton } from "./_components/transactions-list-skelet
 async function TransactionsData({ page }: { page: number }) {
   const { transactions, totalCount } = await getTransactions({
     page,
-    limit: 50, // Aumentar o limit para buscar mais transações
+    limit: 200,
   });
 
   return (

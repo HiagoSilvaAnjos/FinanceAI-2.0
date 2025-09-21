@@ -24,7 +24,7 @@ const AITransactionButton = ({ hasQuota }: AITransactionButtonProps) => {
         onClick={() => setDialogIsOpen(true)}
         className={`flex items-center gap-2 ${buttonClass}`}
       >
-        Adicione sua transação com IA
+        Transação com IA
         <Sparkles className="h-4 w-4" />
       </Button>
 

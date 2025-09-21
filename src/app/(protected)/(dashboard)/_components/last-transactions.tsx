@@ -98,7 +98,9 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
   return (
     <ScrollArea className="max-h-[900px] rounded-md border">
       <CardHeader className="mb-2 mt-4 flex items-center justify-between">
-        <CardTitle className="font-bold">Suas últimas transações</CardTitle>
+        <CardTitle className="text-base font-bold md:text-xl">
+          Suas últimas transações
+        </CardTitle>
         <Button className="rounded-full font-medium text-white" asChild>
           <Link href="/transactions">Ver mais</Link>
         </Button>
@@ -121,7 +123,7 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
                 </div>
                 <div>
                   <p className="text-sm font-bold">{transaction.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-black dark:text-white">
                     {formatTransactionDate(transaction.date)}
                   </p>
                 </div>
@@ -134,7 +136,7 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
           ))
         ) : (
           <div className="flex h-32 items-center justify-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-black dark:text-white">
               Nenhuma transação encontrada para este período
             </p>
           </div>

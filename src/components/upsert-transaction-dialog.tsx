@@ -228,7 +228,7 @@ const UpsertTransactionDialog = ({
                       {isCreditCard &&
                         form.watch("installments") &&
                         form.watch("installments")! > 1 && (
-                          <span className="ml-2 text-sm text-muted-foreground">
+                          <span className="ml-2 text-sm text-black dark:text-white">
                             (Valor total - será dividido em{" "}
                             {form.watch("installments")} parcelas)
                           </span>
@@ -284,7 +284,7 @@ const UpsertTransactionDialog = ({
                   <FormItem>
                     <FormLabel>
                       Categoria da transação
-                      <span className="ml-2 text-sm text-muted-foreground">
+                      <span className="ml-2 text-sm text-black dark:text-white">
                         ({transactionType === "EXPENSE" ? "Despesa" : "Receita"}
                         )
                       </span>
@@ -316,7 +316,7 @@ const UpsertTransactionDialog = ({
                     <FormLabel>
                       Forma de pagamento
                       {isInstallmentTransaction && (
-                        <span className="ml-2 text-sm text-muted-foreground">
+                        <span className="ml-2 text-sm text-black dark:text-white">
                           (Transação parcelada - não editável)
                         </span>
                       )}
@@ -376,7 +376,7 @@ const UpsertTransactionDialog = ({
                         field.value > 1 &&
                         form.watch("amount") > 0 && (
                           <div className="mt-2 rounded-md bg-muted/50 p-2">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-black dark:text-white">
                               <span className="font-medium">Cada parcela:</span>{" "}
                               {new Intl.NumberFormat("pt-BR", {
                                 style: "currency",
@@ -410,7 +410,7 @@ const UpsertTransactionDialog = ({
                           defaultValues.installmentGroup.totalInstallments,
                       )}
                     </p>
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className="mt-2 text-sm text-black dark:text-white">
                       Alterações afetarão todas as parcelas desta compra
                     </p>
                   </div>
@@ -427,7 +427,7 @@ const UpsertTransactionDialog = ({
                       {isCreditCard &&
                         form.watch("installments") &&
                         form.watch("installments")! > 1 && (
-                          <span className="ml-2 text-sm text-muted-foreground">
+                          <span className="ml-2 text-sm text-black dark:text-white">
                             (Data da primeira parcela)
                           </span>
                         )}

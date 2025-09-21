@@ -75,7 +75,7 @@ const TransactionsPieChart = ({
           </ChartContainer>
         ) : (
           <div className="flex h-[250px] items-center justify-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-black dark:text-white">
               Nenhuma transação encontrada para este período.
             </p>
           </div>

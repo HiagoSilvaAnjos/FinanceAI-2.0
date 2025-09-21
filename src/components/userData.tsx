@@ -2,7 +2,7 @@
 
 import {
   ChevronDown,
-  ChevronUp, // Importe o ChevronUp
+  ChevronUp,
   LoaderCircleIcon,
   LogOutIcon,
   MailIcon,
@@ -42,7 +42,7 @@ const User = () => {
 
   const [signOutIsLoading, setSignOutIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(getInitialTheme);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para controlar o menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const body = document.documentElement;
@@ -55,6 +55,9 @@ const User = () => {
       body.classList.add("light");
       localStorage.setItem("theme", "light");
     }
+
+    // Disparar evento customizado para notificar outros componentes
+    window.dispatchEvent(new CustomEvent("themeChanged"));
   }, [isDarkMode]);
 
   const toggleTheme = () => setIsDarkMode((prev) => !prev);
@@ -97,7 +100,7 @@ const User = () => {
   return (
     <DropdownMenu onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger asChild>
-        <div className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/55 px-2 py-2 transition ease-in-out hover:bg-zinc-900">
+        <div className="flex cursor-pointer items-center gap-2 rounded-lg border px-2 py-2 transition ease-in-out hover:bg-zinc-200 dark:border-white/55 dark:hover:bg-zinc-900">
           <Avatar>
             <AvatarImage src={session?.user?.image as string | undefined} />
             <AvatarFallback>{avatarFallback}</AvatarFallback>
@@ -126,7 +129,9 @@ const User = () => {
                   className={`flex cursor-pointer justify-between ${
                     !isDarkMode ? "bg-accent" : ""
                   }`}
-                  onClick={() => toggleTheme()}
+                  onClick={() => {
+                    if (isDarkMode) toggleTheme();
+                  }}
                 >
                   Claro <SunIcon />
                 </DropdownMenuItem>
@@ -134,7 +139,9 @@ const User = () => {
                   className={`flex cursor-pointer justify-between ${
                     isDarkMode ? "bg-accent" : ""
                   }`}
-                  onClick={() => toggleTheme()}
+                  onClick={() => {
+                    if (!isDarkMode) toggleTheme();
+                  }}
                 >
                   Escuro <MoonIcon />
                 </DropdownMenuItem>
