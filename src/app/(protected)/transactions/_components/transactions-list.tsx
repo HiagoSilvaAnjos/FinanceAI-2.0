@@ -435,9 +435,28 @@ export default function TransactionsList({
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) {
+    // Criar as datas de comparação sem hora
+    const todayDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const yesterdayDate = new Date(
+      yesterday.getFullYear(),
+      yesterday.getMonth(),
+      yesterday.getDate(),
+    );
+
+    // Converter a data para apenas data (sem hora)
+    const dateOnly = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+
+    if (dateOnly.getTime() === todayDate.getTime()) {
       return "Hoje";
-    } else if (date.toDateString() === yesterday.toDateString()) {
+    } else if (dateOnly.getTime() === yesterdayDate.getTime()) {
       return "Ontem";
     } else {
       // Formato completo com ano: "domingo, 18 de janeiro de 2026"
@@ -446,7 +465,6 @@ export default function TransactionsList({
         day: "numeric",
         month: "long",
         year: "numeric",
-        timeZone: "UTC",
       });
     }
   };

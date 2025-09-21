@@ -53,8 +53,6 @@ interface AIResponse {
   confidence: number;
 }
 
-// (Funções detectPromptInjection e sanitizeInput permanecem as mesmas)
-
 function detectPromptInjection(input: string): boolean {
   const lowercaseInput = input.toLowerCase();
   const hasSuspiciousPatterns = SUSPICIOUS_PATTERNS.some((pattern) =>
@@ -126,6 +124,13 @@ export async function parseTransactionWithAI(
   userInput: string,
 ): Promise<AIResponse> {
   try {
+    // Função para criar data correta no timezone local
+    const createCorrectDate = (dateString: string): Date => {
+      // Se a data vier no formato YYYY-MM-DD, criar a data no timezone local
+      const [year, month, day] = dateString.split("-").map(Number);
+      return new Date(year, month - 1, day, 12, 0, 0); // 12:00 para evitar problemas de timezone
+    };
+
     const hoje = new Date();
     const ontem = new Date();
     ontem.setDate(hoje.getDate() - 1);
@@ -365,7 +370,7 @@ ENTRADA DO USUÁRIO:
         }
       }
 
-      // Validar e normalizar dados
+      // CORREÇÃO PRINCIPAL: usar createCorrectDate ao invés de new Date
       const validatedTransaction: ParsedTransaction = {
         name: String(transaction.name).substring(0, 100),
         amount: Math.abs(Number(transaction.amount)),
@@ -382,7 +387,9 @@ ENTRADA DO USUÁRIO:
         ].includes(transaction.paymentMethod)
           ? transaction.paymentMethod
           : "OTHER",
-        date: transaction.date ? new Date(transaction.date) : new Date(),
+        date: transaction.date
+          ? createCorrectDate(transaction.date)
+          : new Date(),
         installments:
           transaction.installments && transaction.installments > 1
             ? Math.min(24, Math.max(1, transaction.installments))
