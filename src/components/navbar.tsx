@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import User from "@/app/(protected)/userData";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import User from "@/components/userData";
 
 const NavBar = () => {
   const pathname = usePathname();

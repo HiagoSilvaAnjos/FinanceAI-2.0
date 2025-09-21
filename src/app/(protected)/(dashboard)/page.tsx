@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
 import MonthlyHistoryChart from "@/components/monthly-history-chart";
-import NavBar from "@/components/navbar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUsageAndTransactionCount } from "@/data/get-ai-usage/get-ai-usage";
 import { getDashboard } from "@/data/get-dashboard";
@@ -122,7 +121,6 @@ export default async function Home({ searchParams }: HomeProps) {
 
   return (
     <div>
-      <NavBar />
       <div className="space-y-6 p-6">
         <Suspense fallback={<DashboardHeaderSkeleton />}>
           <DashboardHeader month={selectedMonth} year={selectedYear} />

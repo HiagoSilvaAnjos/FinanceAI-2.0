@@ -5,7 +5,6 @@ import { Suspense } from "react";
 import AddTransactionButton from "@/components/add-transaction-button";
 import AITransactionButton from "@/components/ai-transaction-button";
 import GenerateReportButton from "@/components/generate-report-button";
-import NavBar from "@/components/navbar";
 import { DataTable } from "@/components/ui/data-table";
 import { getUsageAndTransactionCount } from "@/data/get-ai-usage/get-ai-usage";
 import { getTransactions } from "@/data/get-transactions-data/get-transactions-data";
@@ -68,7 +67,6 @@ const TransactionsPage = async ({ searchParams }: TransactionsPageProps) => {
 
   return (
     <>
-      <NavBar />
       <div className="space-y-6 p-6">
         <div className="flex w-full flex-col items-start justify-between gap-4 text-2xl md:flex-row md:items-center">
           <h1 className="text-2xl font-bold">Transações</h1>

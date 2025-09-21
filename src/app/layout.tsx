@@ -1,12 +1,11 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Mulish } from "next/font/google";
 
-import { ChatbotDialog } from "@/components/chatbot-dialog";
 import { Toaster } from "@/components/ui/sonner";
 
-const roboto = Roboto({
+const mulish = Mulish({
   weight: "400",
   subsets: ["latin"],
 });
@@ -25,11 +24,10 @@ export default function RootLayout({
     <html lang="pt-BR">
       <head></head>
       <body
-        className={`${roboto.className} antialiased transition-colors duration-500`}
+        className={`${mulish.className} antialiased transition-colors duration-500`}
       >
         {children}
         <Toaster />
-        <ChatbotDialog />
       </body>
     </html>
   );
