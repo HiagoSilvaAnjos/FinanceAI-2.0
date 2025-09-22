@@ -30,7 +30,7 @@ interface TimeSelectProps {
   selectedYear: string;
 }
 
-const TimeSelect = ({ selectedMonth, selectedYear }: TimeSelectProps) => {
+function TimeSelect({ selectedMonth, selectedYear }: TimeSelectProps) {
   const { push } = useRouter();
 
   const generateYearOptions = () => {
@@ -87,6 +87,6 @@ const TimeSelect = ({ selectedMonth, selectedYear }: TimeSelectProps) => {
       </Select>
     </div>
   );
-};
+}
 
 export default TimeSelect;

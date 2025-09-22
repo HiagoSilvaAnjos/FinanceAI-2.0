@@ -14,6 +14,7 @@ import {
   TRANSACTION_PAYMENT_METHOD_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
 } from "@/constants/transactions";
+import { getBrazilDate, toBrazilDate } from "@/lib/date-utils";
 
 import { MoneyInput } from "./money-input";
 import { Button } from "./ui/button";
@@ -82,7 +83,7 @@ const UpsertTransactionDialog = ({
     defaultValues: defaultValues
       ? {
           ...defaultValues,
-          date: new Date(defaultValues.date),
+          date: toBrazilDate(new Date(defaultValues.date)),
           // Se for parcela, usar o valor total original dividido pelas parcelas para mostrar o valor total
           amount:
             isInstallmentTransaction && defaultValues.installmentGroup
@@ -97,7 +98,7 @@ const UpsertTransactionDialog = ({
       : {
           amount: 0,
           category: "OTHER",
-          date: new Date(),
+          date: getBrazilDate(),
           name: "",
           paymentMethod: "CASH",
           type: "EXPENSE",
@@ -121,7 +122,7 @@ const UpsertTransactionDialog = ({
     if (isOpen && defaultValues) {
       form.reset({
         ...defaultValues,
-        date: new Date(defaultValues.date),
+        date: toBrazilDate(new Date(defaultValues.date)),
         // Se for parcela, usar o valor total original
         amount:
           isInstallmentTransaction && defaultValues.installmentGroup

@@ -1,3 +1,4 @@
+// src/app/(protected)/(dashboard)/page.tsx
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -10,6 +11,7 @@ import { getUsageAndTransactionCount } from "@/data/get-ai-usage/get-ai-usage";
 import { getDashboard } from "@/data/get-dashboard";
 import { getHistoricalData } from "@/data/get-historical-data";
 import { auth } from "@/lib/auth";
+import { getBrazilDate } from "@/lib/date-utils";
 
 import AIUsageButton from "./_components/ai-usage-button";
 import {
@@ -113,7 +115,8 @@ export default async function Home({ searchParams }: HomeProps) {
     redirect("/authentication");
   }
 
-  const currentDate = new Date();
+  // Usar data do Brasil ao invés de new Date()
+  const currentDate = getBrazilDate();
   const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
   const currentYear = String(currentDate.getFullYear());
   const selectedMonth = month ?? currentMonth;

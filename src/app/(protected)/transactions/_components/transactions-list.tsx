@@ -38,6 +38,7 @@ import {
   TRANSACTION_PAYMENT_METHOD_LABELS,
   TRANSACTION_PAYMENT_METHOD_OPTIONS,
 } from "@/constants/transactions";
+import { formatBrazilDateFull } from "@/lib/date-utils";
 import { Transaction } from "@/types/transaction";
 
 import DeleteTransactionButton from "./delete-transaction-button";
@@ -433,42 +434,7 @@ export default function TransactionsList({
   }, [transactions, searchQuery, filters]);
 
   const formatDateHeader = (date: Date) => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    // Criar as datas de comparação sem hora
-    const todayDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
-    const yesterdayDate = new Date(
-      yesterday.getFullYear(),
-      yesterday.getMonth(),
-      yesterday.getDate(),
-    );
-
-    // Converter a data para apenas data (sem hora)
-    const dateOnly = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-    );
-
-    if (dateOnly.getTime() === todayDate.getTime()) {
-      return "Hoje";
-    } else if (dateOnly.getTime() === yesterdayDate.getTime()) {
-      return "Ontem";
-    } else {
-      // Formato completo com ano: "domingo, 18 de janeiro de 2026"
-      return date.toLocaleDateString("pt-BR", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-    }
+    return formatBrazilDateFull(date);
   };
 
   const hasActiveFilters = Object.values(filters).some(

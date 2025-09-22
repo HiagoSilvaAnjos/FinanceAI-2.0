@@ -11,6 +11,7 @@ import {
 } from "@/constants/transactions";
 import { transactionTable } from "@/db/schema";
 import { formatCurrency } from "@/lib/currency";
+import { formatBrazilDate } from "@/lib/date-utils";
 
 type Transaction = InferSelectModel<typeof transactionTable>;
 
@@ -38,61 +39,6 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
       return "+";
     }
     return "-";
-  };
-
-  const formatTransactionDate = (date: Date) => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    // Criar as datas de comparação sem hora para evitar problemas de timezone
-    const todayDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
-    const yesterdayDate = new Date(
-      yesterday.getFullYear(),
-      yesterday.getMonth(),
-      yesterday.getDate(),
-    );
-
-    // Converter a data da transação para apenas data (sem hora)
-    const transactionDate = new Date(date);
-    const transactionOnlyDate = new Date(
-      transactionDate.getFullYear(),
-      transactionDate.getMonth(),
-      transactionDate.getDate(),
-    );
-
-    // Se for hoje
-    if (transactionOnlyDate.getTime() === todayDate.getTime()) {
-      return "Hoje";
-    }
-
-    // Se for ontem
-    if (transactionOnlyDate.getTime() === yesterdayDate.getTime()) {
-      return "Ontem";
-    }
-
-    // Verificar se é do ano atual
-    const currentYear = today.getFullYear();
-    const transactionYear = transactionDate.getFullYear();
-
-    if (transactionYear === currentYear) {
-      // Ano atual - mostrar sem o ano
-      return transactionDate.toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      });
-    } else {
-      // Ano diferente - mostrar com o ano
-      return transactionDate.toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-    }
   };
 
   return (
@@ -124,7 +70,8 @@ const LastTransactions = ({ lastTransactions }: LastTransactionsProps) => {
                 <div>
                   <p className="text-sm font-bold">{transaction.name}</p>
                   <p className="text-sm text-black dark:text-white">
-                    {formatTransactionDate(transaction.date)}
+                    {formatBrazilDate(transaction.date)}{" "}
+                    {/* <- Usando nova função */}
                   </p>
                 </div>
               </div>

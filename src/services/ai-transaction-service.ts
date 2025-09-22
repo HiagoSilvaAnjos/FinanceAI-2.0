@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import Groq from "groq-sdk";
 
+import {
+  getBrazilDate,
+  getBrazilDateString,
+  parseBrazilDateString,
+} from "@/lib/date-utils";
+
 const groq = new Groq({
   apiKey: process.env.API_GROQ_CLIENT,
 });
@@ -126,20 +132,18 @@ export async function parseTransactionWithAI(
   try {
     // Função para criar data correta no timezone local
     const createCorrectDate = (dateString: string): Date => {
-      // Se a data vier no formato YYYY-MM-DD, criar a data no timezone local
-      const [year, month, day] = dateString.split("-").map(Number);
-      return new Date(year, month - 1, day, 12, 0, 0); // 12:00 para evitar problemas de timezone
+      return parseBrazilDateString(dateString);
     };
 
-    const hoje = new Date();
-    const ontem = new Date();
+    const hoje = getBrazilDate();
+    const ontem = new Date(hoje);
     ontem.setDate(hoje.getDate() - 1);
-    const amanha = new Date();
+    const amanha = new Date(hoje);
     amanha.setDate(hoje.getDate() + 1);
 
-    const hojeFormatado = hoje.toISOString().split("T")[0];
-    const ontemFormatado = ontem.toISOString().split("T")[0];
-    const amanhaFormatado = amanha.toISOString().split("T")[0];
+    const hojeFormatado = getBrazilDateString(hoje);
+    const ontemFormatado = getBrazilDateString(ontem);
+    const amanhaFormatado = getBrazilDateString(amanha);
 
     if (detectPromptInjection(userInput)) {
       return {
@@ -171,11 +175,12 @@ REGRAS IMPORTANTES:
 4. Se não conseguir extrair uma transação válida, retorne um erro
 5. IMPORTANTE: As categorias são diferentes para DESPESAS e DEPÓSITOS
 
-REGRAS DE DATA:
-- Hoje é ${hojeFormatado}.
+REGRAS DE DATA (Timezone do Brasil - America/Sao_Paulo):
+- Hoje é ${hojeFormatado} (horário do Brasil).
 - Se o usuário disser "ontem", use a data ${ontemFormatado}.
 - Se o usuário disser "amanhã", use a data ${amanhaFormatado}.
 - Se nenhuma data for especificada, use a data de hoje (${hojeFormatado}).
+- IMPORTANTE: Sempre considere o fuso horário do Brasil (GMT-3).
 
 FORMATO DE RESPOSTA (JSON):
 {
@@ -370,7 +375,6 @@ ENTRADA DO USUÁRIO:
         }
       }
 
-      // CORREÇÃO PRINCIPAL: usar createCorrectDate ao invés de new Date
       const validatedTransaction: ParsedTransaction = {
         name: String(transaction.name).substring(0, 100),
         amount: Math.abs(Number(transaction.amount)),
@@ -389,7 +393,7 @@ ENTRADA DO USUÁRIO:
           : "OTHER",
         date: transaction.date
           ? createCorrectDate(transaction.date)
-          : new Date(),
+          : getBrazilDate(),
         installments:
           transaction.installments && transaction.installments > 1
             ? Math.min(24, Math.max(1, transaction.installments))

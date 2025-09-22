@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { TRANSACTION_CATEGORY_LABELS } from "@/constants/transactions";
 import { getDashboard } from "@/data/get-dashboard";
 import { auth } from "@/lib/auth";
+import { formatBrazilDate, getBrazilDate } from "@/lib/date-utils";
 
 import { checkAIQuota, incrementAIUsage } from "./ai-quota-service";
 
@@ -23,7 +24,7 @@ export async function getChatbotResponse(question: string): Promise<string> {
       return `Você atingiu seu limite de ${quotaCheck.limit} mensagens hoje. O limite será reiniciado em ${quotaCheck.timeUntilReset}.`;
     }
 
-    const currentDate = new Date();
+    const currentDate = getBrazilDate();
     const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
     const currentYear = String(currentDate.getFullYear());
 
@@ -42,14 +43,15 @@ export async function getChatbotResponse(question: string): Promise<string> {
           }${t.amount.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
-          })} em ${new Date(t.date).toLocaleDateString("pt-BR")}`,
+          })} em ${formatBrazilDate(t.date)}`,
       )
       .join("\n");
 
-    const today = new Date().toLocaleDateString("pt-BR", {
+    const today = currentDate.toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+      timeZone: "America/Sao_Paulo",
     });
 
     const projectContext = `
