@@ -6,10 +6,6 @@ npm-debug.log*
 .next/
 out/
 
-# Environment files
-.env.local
-.env.production
-
 # IDE/Editor files
 .vscode/
 .idea/
@@ -25,9 +21,9 @@ Thumbs.db
 .gitignore
 
 # Docker
-Dockerfile
 .dockerignore
-docker-compose*.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
 
 # Testing
 coverage/
@@ -46,3 +42,10 @@ pids
 # Temporary folders
 tmp/
 temp/
+
+# Documentation
+README.md
+ENVIRONMENTS.md
+
+# NÃO ignorar os arquivos de ambiente para Docker
+# .env*

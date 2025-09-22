@@ -1,0 +1,22 @@
+# Dockerfile para desenvolvimento - Finance AI 2.0
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Instalar dependências do sistema
+RUN apk add --no-cache libc6-compat
+
+# Copiar arquivos de dependências
+COPY package.json package-lock.json ./
+
+# Instalar todas as dependências (incluindo devDependencies)
+RUN npm ci
+
+# Copiar código fonte
+COPY . .
+
+# Expor porta de desenvolvimento
+EXPOSE 3000
+
+# Comando para desenvolvimento - apenas Next.js
+CMD ["npx", "next", "dev", "--hostname", "0.0.0.0"]

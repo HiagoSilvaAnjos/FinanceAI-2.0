@@ -1,7 +1,8 @@
 services:
+  # Banco PostgreSQL para desenvolvimento
   postgres:
     image: postgres:17
-    container_name: local-postgres-financeai
+    container_name: financeai-postgres-dev
     restart: always
     ports:
       - "5432:5432"
@@ -11,12 +12,66 @@ services:
       POSTGRES_DB: local_db
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_dev_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U local_user -d local_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - dev-network
+
+  # Container para setup inicial do banco
+  db-setup:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: financeai-db-setup
+    env_file:
+      - .env.local
+    environment:
+      - DATABASE_URL=postgresql://local_user:local_password@postgres:5432/local_db
+    command: >
+      sh -c "
+        echo 'Aguardando PostgreSQL estar pronto...' &&
+        sleep 10 &&
+        echo 'Executando Drizzle push...' &&
+        npx drizzle-kit push --config=drizzle.config.ts
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dev-network
+    profiles:
+      - setup
+
+  # Aplicação FinanceAI em desenvolvimento
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: financeai-app-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - DATABASE_URL=postgresql://local_user:local_password@postgres:5432/local_db
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dev-network
 
 volumes:
-  postgres_data:
+  postgres_dev_data:
+
+networks:
+  dev-network:
+    driver: bridge

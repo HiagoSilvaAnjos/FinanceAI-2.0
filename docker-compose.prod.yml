@@ -1,0 +1,18 @@
+services:
+  # FinanceAI em produção com banco remoto
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financeai-app-prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    networks:
+      - prod-network
+
+networks:
+  prod-network:
+    driver: bridge
